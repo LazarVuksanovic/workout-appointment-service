@@ -22,4 +22,5 @@ public class User {
     private LocalDate dateOfBirth;
     private String firstName;
     private String lastName;
+    private String role;
 }
