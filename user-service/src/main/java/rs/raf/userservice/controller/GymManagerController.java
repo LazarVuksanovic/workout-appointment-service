@@ -20,13 +20,13 @@ public class GymManagerController {
 
     public GymManagerController(GymManagerService gymManagerService){ this.gymManagerService = gymManagerService; }
 
-    @ApiOperation(value = "find all gym managers")
+    @ApiOperation(value = "Find all gym managers")
     @GetMapping
     public ResponseEntity<Page<GymManagerDto>> findAll(Pageable pageable){
         return new ResponseEntity<>(this.gymManagerService.findAll(pageable), HttpStatus.OK);
     }
 
-    @ApiOperation(value = "register gym manager")
+    @ApiOperation(value = "Register gym manager")
     @PostMapping
     public ResponseEntity<GymManagerDto> saveGymManager(@RequestBody @Valid GymManagerCreateDto gymManagerCreateDto){
         return new ResponseEntity<>(this.gymManagerService.add(gymManagerCreateDto), HttpStatus.OK);

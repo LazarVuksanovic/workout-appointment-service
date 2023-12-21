@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.raf.userservice.dto.ClientCreateDto;
 import rs.raf.userservice.dto.ClientDto;
+import rs.raf.userservice.dto.TokenRequestDto;
+import rs.raf.userservice.dto.TokenResponseDto;
 import rs.raf.userservice.service.ClientService;
 
 import javax.validation.Valid;
@@ -22,7 +24,7 @@ public class ClientController {
 
     public ClientController(ClientService clientService){ this.clientService = clientService; }
 
-    @ApiOperation(value = "find all clients")
+    @ApiOperation(value = "Find all clients")
     @GetMapping
     public ResponseEntity<Page<ClientDto>> findAll(Pageable pageable){
         return new ResponseEntity<>(this.clientService.findAll(pageable), HttpStatus.OK);
