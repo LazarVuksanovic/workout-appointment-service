@@ -34,6 +34,7 @@ public class GymManagerMapper {
         gymManager.setDateOfBirth(gymManagerCreateDto.getDateOfBirth());
         gymManager.setGymName(gymManagerCreateDto.getGymName());
         gymManager.setEmploymentDate(LocalDate.now());
+        gymManager.setRole("gymmanager");
         return gymManager;
     }
 }

@@ -35,6 +35,7 @@ public class ClientMapper {
         client.setDateOfBirth(clientCreateDto.getDateOfBirth());
         client.setMembershipCardNumber(generateMembershipCard(clientCreateDto));
         client.setScheduledTrainings(0);
+        client.setRole("client");
         return client;
     }
 
