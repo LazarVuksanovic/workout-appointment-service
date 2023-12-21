@@ -1,8 +1,10 @@
 package rs.raf.userservice.domain;
 
-import jakarta.persistence.Entity;
+import javax.persistence.Entity;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -10,5 +12,5 @@ import lombok.Setter;
 public class GymManager extends User{
 
     private String gymName;
-    private String employmentDate;
+    private LocalDate employmentDate;
 }

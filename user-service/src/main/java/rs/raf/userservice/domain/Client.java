@@ -1,6 +1,6 @@
 package rs.raf.userservice.domain;
 
-import jakarta.persistence.Entity;
+import javax.persistence.Entity;
 import lombok.Getter;
 import lombok.Setter;
 

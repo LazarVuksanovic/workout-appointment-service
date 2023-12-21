@@ -1,8 +1,10 @@
 package rs.raf.userservice.domain;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -17,7 +19,7 @@ public class User {
     private String username;
     private String password;
     private String email;
-    private String dateOfBirth;
+    private LocalDate dateOfBirth;
     private String firstName;
     private String lastName;
 }
