@@ -1,6 +1,8 @@
 package rs.raf.userservice.service.impl;
 
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -8,8 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 import rs.raf.userservice.domain.Client;
 import rs.raf.userservice.dto.ClientCreateDto;
 import rs.raf.userservice.dto.ClientDto;
+import rs.raf.userservice.dto.TokenRequestDto;
+import rs.raf.userservice.dto.TokenResponseDto;
+import rs.raf.userservice.exception.NotFoundException;
 import rs.raf.userservice.mapper.ClientMapper;
 import rs.raf.userservice.repository.ClientRepository;
+import rs.raf.userservice.security.service.TokenService;
 import rs.raf.userservice.service.ClientService;
 
 import java.util.ArrayList;
@@ -21,10 +27,12 @@ public class ClientServiceImpl implements ClientService {
 
     private ClientRepository clientRepository;
     private ClientMapper clientMapper;
+    private TokenService tokenService;
 
-    public ClientServiceImpl(ClientRepository clientRepository, ClientMapper clientMapper){
+    public ClientServiceImpl(ClientRepository clientRepository, ClientMapper clientMapper, TokenService tokenService){
         this.clientRepository = clientRepository;
         this.clientMapper = clientMapper;
+        this.tokenService = tokenService;
     }
 
     @Override
