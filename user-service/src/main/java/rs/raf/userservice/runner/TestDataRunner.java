@@ -23,6 +23,7 @@ public class TestDataRunner implements CommandLineRunner {
         admin.setEmail("lvuksanovic1021rn@raf.rs");
         admin.setPassword("admin");
         admin.setUsername("admin");
+        admin.setRole("admin");
         this.adminRepository.save(admin);
     }
 }
