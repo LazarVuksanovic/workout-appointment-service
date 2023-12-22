@@ -1,6 +1,5 @@
 package rs.raf.userservice.controller;
 
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,12 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.raf.userservice.dto.ClientCreateDto;
 import rs.raf.userservice.dto.ClientDto;
-import rs.raf.userservice.dto.TokenRequestDto;
-import rs.raf.userservice.dto.TokenResponseDto;
+import rs.raf.userservice.dto.UserUpdateDto;
 import rs.raf.userservice.service.ClientService;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/user/client")
