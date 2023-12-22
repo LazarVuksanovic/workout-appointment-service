@@ -16,7 +16,7 @@ public class GymManagerCreateDto {
     @NotNull
     private String username;
 
-    @Length(min = 8, max = 20)
+    @Length(min = 3, max = 20)
     private String password;
 
     @Email
