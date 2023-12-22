@@ -10,5 +10,5 @@ import java.time.LocalDate;
 public class ClientDto extends UserDto{
 
     private String membershipCardNumber;
-    private int scheduledTrainings;
+    private Integer scheduledTrainings;
 }

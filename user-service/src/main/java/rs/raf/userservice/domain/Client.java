@@ -10,5 +10,5 @@ import lombok.Setter;
 public class Client extends User{
 
     private String membershipCardNumber;
-    private int scheduledTrainings;
+    private Integer scheduledTrainings;
 }
