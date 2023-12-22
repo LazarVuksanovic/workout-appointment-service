@@ -8,10 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rs.raf.userservice.domain.Client;
-import rs.raf.userservice.dto.ClientCreateDto;
-import rs.raf.userservice.dto.ClientDto;
-import rs.raf.userservice.dto.TokenRequestDto;
-import rs.raf.userservice.dto.TokenResponseDto;
+import rs.raf.userservice.dto.*;
 import rs.raf.userservice.exception.NotFoundException;
 import rs.raf.userservice.mapper.ClientMapper;
 import rs.raf.userservice.repository.ClientRepository;
@@ -23,7 +20,6 @@ import java.util.ArrayList;
 @Service
 @Transactional
 public class ClientServiceImpl implements ClientService {
-
 
     private ClientRepository clientRepository;
     private ClientMapper clientMapper;
