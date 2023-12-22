@@ -4,10 +4,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import rs.raf.userservice.dto.TokenRequestDto;
-import rs.raf.userservice.dto.TokenResponseDto;
-import rs.raf.userservice.dto.UserDto;
-import rs.raf.userservice.dto.UserUpdateDto;
+import rs.raf.userservice.dto.*;
+import rs.raf.userservice.security.CheckSecurity;
 import rs.raf.userservice.service.UserService;
 
 import javax.validation.Valid;
@@ -33,5 +31,21 @@ public class UserController {
     public ResponseEntity<UserDto> updateClient(@RequestHeader("Authorization") String authorization,
                                                 @RequestBody @Valid UserUpdateDto userUpdateDto){
         return new ResponseEntity<>(this.userService.update(authorization, userUpdateDto), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Ban user")
+    @PostMapping("/ban")
+    @CheckSecurity(roles = {"admin"})
+    public ResponseEntity<BannedUserDto> banUser(@RequestHeader("Authorization") String authorization,
+                                                 @RequestBody @Valid BannedUserDto bannedUserDto){
+        return new ResponseEntity<>(this.userService.banUser(authorization, bannedUserDto), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Unban user")
+    @PostMapping("/unban")
+    @CheckSecurity(roles = {"admin"})
+    public ResponseEntity<BannedUserDto> unbanUser(@RequestHeader("Authorization") String authorization,
+                                                 @RequestBody @Valid BannedUserDto bannedUserDto){
+        return new ResponseEntity<>(this.userService.unbanUser(authorization, bannedUserDto), HttpStatus.OK);
     }
 }
