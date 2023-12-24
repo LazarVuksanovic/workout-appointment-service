@@ -8,4 +8,5 @@ public interface UserService {
     UserDto update(String authorization, UserUpdateDto userUpdateDto);
     BannedUserDto banUser(String authorization, BannedUserDto bannedUserDto);
     BannedUserDto unbanUser(String authorization, BannedUserDto bannedUserDto);
+    IdDto userId(String authorization);
 }

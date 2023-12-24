@@ -48,4 +48,10 @@ public class UserController {
                                                  @RequestBody @Valid BannedUserDto bannedUserDto){
         return new ResponseEntity<>(this.userService.unbanUser(authorization, bannedUserDto), HttpStatus.OK);
     }
+
+    @ApiOperation(value = "User id from token")
+    @GetMapping("/id")
+    public ResponseEntity<IdDto> userId(@RequestHeader("Authorization") String authorization){
+        return new ResponseEntity<>(this.userService.userId(authorization), HttpStatus.OK);
+    }
 }

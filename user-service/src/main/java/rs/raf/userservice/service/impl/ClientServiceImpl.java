@@ -42,4 +42,24 @@ public class ClientServiceImpl implements ClientService {
         this.clientRepository.save(client);
         return this.clientMapper.clientToClientDto(client);
     }
+
+    @Override
+    public Long scheduleAppointment(String authorization) {
+        Claims claims = this.tokenService.parseToken(authorization);
+        Client client = this.clientRepository
+                .findById(claims.get("id", Integer.class).longValue())
+                .orElseThrow(() -> new NotFoundException("greska"));
+        client.setScheduledTrainings(client.getScheduledTrainings()+1);
+        return client.getId();
+    }
+
+    @Override
+    public Long cancelAppointment(String authorization) {
+        Claims claims = this.tokenService.parseToken(authorization);
+        Client client = this.clientRepository
+                .findById(claims.get("id", Integer.class).longValue())
+                .orElseThrow(() -> new NotFoundException("greska"));
+        client.setScheduledTrainings(client.getScheduledTrainings()-1);
+        return client.getId();
+    }
 }

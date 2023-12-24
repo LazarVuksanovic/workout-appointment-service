@@ -32,4 +32,16 @@ public class ClientController {
     public ResponseEntity<ClientDto> saveClient(@RequestBody @Valid ClientCreateDto clientCreateDto) {
         return new ResponseEntity<>(this.clientService.add(clientCreateDto), HttpStatus.CREATED);
     }
+
+    @ApiOperation(value = "User schedule appointment")
+    @GetMapping("/schedule-appointment")
+    public ResponseEntity<Long> scheduleAppointment(@RequestHeader("Authorization") String authorization){
+        return new ResponseEntity<>(this.clientService.scheduleAppointment(authorization), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "User cancel appointment")
+    @GetMapping("/cancel-appointment")
+    public ResponseEntity<Long> cancelAppointment(@RequestHeader("Authorization") String authorization){
+        return new ResponseEntity<>(this.clientService.cancelAppointment(authorization), HttpStatus.OK);
+    }
 }

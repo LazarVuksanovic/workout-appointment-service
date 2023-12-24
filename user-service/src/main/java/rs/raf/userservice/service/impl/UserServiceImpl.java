@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rs.raf.userservice.domain.BannedUser;
+import rs.raf.userservice.domain.Client;
 import rs.raf.userservice.domain.GymManager;
 import rs.raf.userservice.domain.User;
 import rs.raf.userservice.dto.*;
@@ -58,6 +59,7 @@ public class UserServiceImpl implements UserService {
         return new TokenResponseDto(this.tokenService.generate(claims));
     }
 
+
     @Override
     public UserDto update(String authorization, UserUpdateDto userUpdateDto) {
         Claims claims = this.tokenService.parseToken(authorization);
@@ -102,5 +104,16 @@ public class UserServiceImpl implements UserService {
 
         this.bannedUserRepository.delete(this.bannedUserMapper.bannedUserDtoToBannedUser(bannedUserDto));
         return bannedUserDto;
+    }
+
+    @Override
+    public IdDto userId(String authorization) {
+        Claims claims = this.tokenService.parseToken(authorization);
+        User user = this.userRepository
+                .findById(claims.get("id", Integer.class).longValue())
+                .orElseThrow(() -> new NotFoundException("greska"));
+        IdDto idDto = new IdDto();
+        idDto.setId(user.getId());
+        return idDto;
     }
 }
