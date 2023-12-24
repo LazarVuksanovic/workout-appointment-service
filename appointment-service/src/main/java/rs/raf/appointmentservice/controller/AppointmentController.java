@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rs.raf.appointmentservice.client.userservice.dto.IdDto;
 import rs.raf.appointmentservice.dto.AppointmentDto;
 import rs.raf.appointmentservice.dto.ScheduledAppointmentDto;
 import rs.raf.appointmentservice.service.AppointmentService;
@@ -30,7 +31,15 @@ public class AppointmentController {
     }
     @ApiOperation(value = "Schedule an appointment")
     @PostMapping("/schedule")
-    public ResponseEntity<ScheduledAppointmentDto> scheduleAppointment(@RequestBody ScheduledAppointmentDto scheduledAppointmentDto){
-        return new ResponseEntity<>(this.scheduledAppointmentService.scheduleAppointment(scheduledAppointmentDto), HttpStatus.OK);
+    public ResponseEntity<ScheduledAppointmentDto> scheduleAppointment(@RequestHeader("Authorization") String authorization,
+                                                                       @RequestBody IdDto appointmentId){
+        return new ResponseEntity<>(this.scheduledAppointmentService.scheduleAppointment(authorization, appointmentId), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Cancel an appointment")
+    @PostMapping("/cancel")
+    public ResponseEntity<ScheduledAppointmentDto> cancelAppointment(@RequestHeader("Authorization") String authorization,
+                                                                       @RequestBody IdDto appointmentId){
+        return new ResponseEntity<>(this.scheduledAppointmentService.cancelAppointment(authorization, appointmentId), HttpStatus.OK);
     }
 }
