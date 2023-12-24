@@ -1,5 +1,5 @@
 package rs.raf.appointmentservice.exception;
 
 public enum ErrorCode {
-    RESOURCE_NOT_FOUND, ALREADY_BANNED_USER
+    RESOURCE_NOT_FOUND, NOT_AVAILABLE
 }
