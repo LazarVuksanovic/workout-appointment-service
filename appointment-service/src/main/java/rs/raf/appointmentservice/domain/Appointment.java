@@ -23,7 +23,7 @@ public class Appointment {
 
     private Integer maxPeople;
 
-    private boolean available;
+    private Integer availablePlaces;
 
     @ManyToOne
     @JoinColumn(name = "gym_id")
@@ -36,14 +36,14 @@ public class Appointment {
 //    @ManyToOne
 //    private GymTrainingType gymTrainingType;
 
-    public Appointment(LocalDate date, LocalTime start, LocalTime end, Gym gym, TrainingType trainingType, Integer maxPeople, boolean available){
+    public Appointment(LocalDate date, LocalTime start, LocalTime end, Gym gym, TrainingType trainingType, Integer maxPeople, Integer availablePlaces){
         this.date = date;
         this.start = start;
         this.end = end;
         this.gym = gym;
         this.trainingType = trainingType;
         this.maxPeople = maxPeople;
-        this.available = available;
+        this.availablePlaces = availablePlaces;
     }
 
     public Appointment(){

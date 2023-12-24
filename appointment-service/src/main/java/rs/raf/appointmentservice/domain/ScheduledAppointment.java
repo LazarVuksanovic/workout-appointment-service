@@ -14,5 +14,3 @@ public class ScheduledAppointment {
     @EmbeddedId
     private ScheduledAppointmentId id = new ScheduledAppointmentId();
 }
-
-
