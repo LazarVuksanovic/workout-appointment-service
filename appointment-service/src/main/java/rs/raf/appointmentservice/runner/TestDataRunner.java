@@ -56,10 +56,10 @@ public class TestDataRunner implements CommandLineRunner {
         GymTrainingType gt24 = new GymTrainingType(gym2, type4, BigDecimal.valueOf(500));
         this.gymTrainingTypeRepository.saveAll(Arrays.asList(gt11, gt12, gt23, gt24));
         //Termini
-        Appointment a1 = new Appointment(LocalDate.of(2023, 12, 22), LocalTime.of(19, 0), LocalTime.of(20, 0), gym1, type1, 1, true);
-        Appointment a2 = new Appointment(LocalDate.of(2023, 12, 22), LocalTime.of(20, 0), LocalTime.of(21, 0), gym1, type2, 12, true);
-        Appointment a3 = new Appointment(LocalDate.of(2023, 12, 22), LocalTime.of(18, 0), LocalTime.of(19, 0), gym2, type3, 1, true);
-        Appointment a4 = new Appointment(LocalDate.of(2023, 12, 22), LocalTime.of(19, 0), LocalTime.of(20, 0), gym2, type4, 12, true);
+        Appointment a1 = new Appointment(LocalDate.of(2023, 12, 22), LocalTime.of(19, 0), LocalTime.of(20, 0), gym1, type1, 1, 1);
+        Appointment a2 = new Appointment(LocalDate.of(2023, 12, 22), LocalTime.of(20, 0), LocalTime.of(21, 0), gym1, type2, 12, 12);
+        Appointment a3 = new Appointment(LocalDate.of(2023, 12, 22), LocalTime.of(18, 0), LocalTime.of(19, 0), gym2, type3, 1, 1);
+        Appointment a4 = new Appointment(LocalDate.of(2023, 12, 22), LocalTime.of(19, 0), LocalTime.of(20, 0), gym2, type4, 12, 12);
         this.appointmentRepository.saveAll(Arrays.asList(a1, a2, a3, a4));
     }
 }
