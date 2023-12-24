@@ -10,6 +10,15 @@ public class ScheduledAppointmentDto {
     private Long userId;
     private Long appointmentId;
 
+    public ScheduledAppointmentDto(Long userId, Long appointmentId){
+        this.userId = userId;
+        this.appointmentId = appointmentId;
+    }
+
+    public ScheduledAppointmentDto(){
+
+    }
+
 }
 
 
