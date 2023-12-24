@@ -15,7 +15,7 @@ public class AppointmentMapper {
         appointmentDto.setStart(appointment.getStart());
         appointmentDto.setEnd(appointment.getEnd());
         appointmentDto.setMaxPeople(appointment.getMaxPeople());
-        appointmentDto.setAvailable(appointment.isAvailable());
+        appointmentDto.setAvailablePlaces(appointment.getAvailablePlaces());
         appointmentDto.setGymId(appointment.getGym().getId());
         appointmentDto.setTrainingTypeId(appointment.getTrainingType().getId());
         return appointmentDto;
