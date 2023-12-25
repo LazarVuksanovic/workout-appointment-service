@@ -1,11 +1,14 @@
 package rs.raf.appointmentservice.service.impl;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import rs.raf.appointmentservice.client.userservice.dto.IdDto;
+import rs.raf.appointmentservice.client.userservice.dto.RoleDto;
 import rs.raf.appointmentservice.domain.Appointment;
 import rs.raf.appointmentservice.domain.ScheduledAppointment;
 import rs.raf.appointmentservice.domain.ScheduledAppointmentId;
@@ -18,6 +21,7 @@ import rs.raf.appointmentservice.repository.AppointmentRepository;
 import rs.raf.appointmentservice.repository.ScheduledAppointmentRepository;
 import rs.raf.appointmentservice.service.ScheduledAppointmentService;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -40,7 +44,7 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
     }
 
     @Override
-    public ScheduledAppointmentDto scheduleAppointment(String authorization, IdDto appointmentId) {
+    public ScheduledAppointmentDto scheduleAppointment(String authorization, RoleDto appointmentId) {
         //dohvatamo trazeni termin
         Optional<Appointment> appointment = this.appointmentRepository.findById(appointmentId.getId());
 
@@ -49,13 +53,13 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
             throw new AppointmentNotAvailableException("APPOINTMENT NOT AVAILABLE");
 
         //nalazimo prvo id korisnika da bi mogli da proverimo da li je korisnik vec zakazao taj termin
-        ResponseEntity<IdDto> userId = null;
+        ResponseEntity<RoleDto> user = null;
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", authorization);
 
             HttpEntity<String> request = new HttpEntity<>(headers);
-            userId = this.userServiceRestTemplate.exchange("/user/id", HttpMethod.GET, request, IdDto.class);
+            user = this.userServiceRestTemplate.exchange("/user/id", HttpMethod.GET, request, RoleDto.class);
         }catch (HttpClientErrorException e){
             if(e.getStatusCode().equals(HttpStatus.NOT_FOUND))
                 throw new NotFoundException("NEVALIDAN KORISNIK");
@@ -63,17 +67,17 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
 
         //proveravamo da li je korisnik vec zakazao ovaj termin
         Optional<ScheduledAppointment> s =
-                this.scheduledAppointmentRepository.findById(new ScheduledAppointmentId(userId.getBody().getId(), appointmentId.getId()));
+                this.scheduledAppointmentRepository.findById(new ScheduledAppointmentId(user.getBody().getId(), appointmentId.getId()));
         if(s.isPresent())
             throw new AlreadyScheduledException("KORISNIK JE VEC ZAKAZAO OVAJ TERMIN");
 
-        //komuniciramo sa user-service da dobijemo id korisnika preko tokena
+        //komuniciramo sa user-service da povecamo broj zakazanih treninga korisniku
         try{
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", authorization);
 
             HttpEntity<String> request = new HttpEntity<>(headers);
-            userId = this.userServiceRestTemplate.exchange("/user/client/schedule-appointment", HttpMethod.GET, request, IdDto.class);
+            user = this.userServiceRestTemplate.exchange("/user/client/schedule-appointment", HttpMethod.POST, request, RoleDto.class);
 
         }catch (HttpClientErrorException e) {
             if (e.getStatusCode().equals(HttpStatus.NOT_FOUND))
@@ -85,30 +89,49 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
         this.appointmentRepository.save(appointment.get());
 
         //pravimo zakazan termin i cuvamo u bazu
-        ScheduledAppointmentDto scheduledAppointmentDto = new ScheduledAppointmentDto(userId.getBody().getId(), appointmentId.getId());
+        ScheduledAppointmentDto scheduledAppointmentDto = new ScheduledAppointmentDto(user.getBody().getId(), appointmentId.getId());
         this.scheduledAppointmentRepository.save(this.scheduledAppointmentMapper
                 .scheduledAppointmentDtoToScheduledAppointment(scheduledAppointmentDto));
         return scheduledAppointmentDto;
     }
 
     @Override
-    public ScheduledAppointmentDto cancelAppointment(String authorization, IdDto appointmentId) {
+    public ScheduledAppointmentDto cancelAppointment(String authorization, RoleDto appointmentId) {
         //nalazimo prvo id korisnika da bi mogli da nadjemo taj zakazani termin
-        ResponseEntity<IdDto> userId = null;
+        ResponseEntity<RoleDto> user = null;
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", authorization);
 
             HttpEntity<String> request = new HttpEntity<>(headers);
-            userId = this.userServiceRestTemplate.exchange("/user/id", HttpMethod.GET, request, IdDto.class);
+            user = this.userServiceRestTemplate.exchange("/user/id", HttpMethod.GET, request, RoleDto.class);
         }catch (HttpClientErrorException e){
             if(e.getStatusCode().equals(HttpStatus.NOT_FOUND))
                 throw new NotFoundException("NEVALIDAN KORISNIK");
         }
+        //proveravamo ko je otkazao termin
+        Optional<Appointment> appointment = this.appointmentRepository.findById(appointmentId.getId());
+        if(user.getBody().getRole().equals("gymmanager")){
+            appointment.get().setAvailablePlaces(0);
+            this.appointmentRepository.save(appointment.get());
+
+            // Brišemo sve povezane ScheduledAppointments
+            Appointment appointment1 = new Appointment(appointment.get());
+            this.appointmentRepository.delete(appointment.get());
+            this.appointmentRepository.save(appointment1);
+
+            // Vraćamo odgovor na osnovu uspešno obavljenih akcija
+            ScheduledAppointmentDto scheduledAppointmentDto = new ScheduledAppointmentDto();
+            scheduledAppointmentDto.setAppointmentId(appointment.get().getId());
+            scheduledAppointmentDto.setUserId(user.getBody().getId());
+            return scheduledAppointmentDto;
+        }
+
+        appointment.get().setAvailablePlaces(appointment.get().getAvailablePlaces()+1);
 
         //nalazimo taj zakazani termin
         Optional<ScheduledAppointment> scheduledAppointment =
-                this.scheduledAppointmentRepository.findById(new ScheduledAppointmentId(userId.getBody().getId(),appointmentId.getId()));
+                this.scheduledAppointmentRepository.findById(new ScheduledAppointmentId(user.getBody().getId(),appointmentId.getId()));
 
         //u slucaju da ne postoji
         if(scheduledAppointment.isEmpty())
@@ -120,7 +143,7 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
             headers.set("Authorization", authorization);
 
             HttpEntity<String> request = new HttpEntity<>(headers);
-            this.userServiceRestTemplate.exchange("/user/client/cancel-appointment", HttpMethod.GET, request, Long.class);
+            this.userServiceRestTemplate.exchange("/user/client/cancel-appointment", HttpMethod.POST, request, RoleDto.class);
 
         }catch (HttpClientErrorException e){
             if(e.getStatusCode().equals(HttpStatus.NOT_FOUND))

@@ -6,8 +6,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import rs.raf.appointmentservice.client.userservice.dto.IdDto;
+import rs.raf.appointmentservice.client.userservice.dto.RoleDto;
 import rs.raf.appointmentservice.dto.AppointmentDto;
+import rs.raf.appointmentservice.dto.FilterDto;
 import rs.raf.appointmentservice.dto.ScheduledAppointmentDto;
 import rs.raf.appointmentservice.service.AppointmentService;
 import rs.raf.appointmentservice.service.ScheduledAppointmentService;
@@ -26,20 +27,20 @@ public class AppointmentController {
 
     @ApiOperation(value = "Find all appointments")
     @GetMapping()
-    public ResponseEntity<Page<AppointmentDto>> findAll(Pageable pageable){
-        return new ResponseEntity<>(this.appointmentService.findAll(pageable), HttpStatus.OK);
+    public ResponseEntity<Page<AppointmentDto>> findAll(Pageable pageable, FilterDto filterDto){
+        return new ResponseEntity<>(this.appointmentService.findAll(pageable, filterDto), HttpStatus.OK);
     }
     @ApiOperation(value = "Schedule an appointment")
     @PostMapping("/schedule")
     public ResponseEntity<ScheduledAppointmentDto> scheduleAppointment(@RequestHeader("Authorization") String authorization,
-                                                                       @RequestBody IdDto appointmentId){
-        return new ResponseEntity<>(this.scheduledAppointmentService.scheduleAppointment(authorization, appointmentId), HttpStatus.OK);
+                                                                       @RequestBody RoleDto appointmentId){
+        return new ResponseEntity<>(this.scheduledAppointmentService.scheduleAppointment("Bearer " + authorization, appointmentId), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Cancel an appointment")
     @PostMapping("/cancel")
     public ResponseEntity<ScheduledAppointmentDto> cancelAppointment(@RequestHeader("Authorization") String authorization,
-                                                                       @RequestBody IdDto appointmentId){
-        return new ResponseEntity<>(this.scheduledAppointmentService.cancelAppointment(authorization, appointmentId), HttpStatus.OK);
+                                                                       @RequestBody RoleDto roleDto){
+        return new ResponseEntity<>(this.scheduledAppointmentService.cancelAppointment("Bearer " + authorization, roleDto), HttpStatus.OK);
     }
 }

@@ -5,15 +5,17 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class IdDto {
+public class RoleDto {
 
     private Long id;
+    private String role;
 
-    public IdDto(int id){
+    public RoleDto(int id, String role){
         this.id = (long) id;
+        this.role = role;
     }
 
-    public IdDto(){
+    public RoleDto(){
 
     }
 }

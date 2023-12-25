@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.Embeddable;
+import javax.persistence.MapsId;
 import java.io.Serializable;
 
 @Getter
@@ -12,6 +13,7 @@ import java.io.Serializable;
 public class ScheduledAppointmentId implements Serializable {
 
     private Long userId;
+    @MapsId
     private Long appointmentId;
 
 

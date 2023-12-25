@@ -6,6 +6,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Set;
 
 
 @Getter
@@ -33,8 +34,8 @@ public class Appointment {
     @JoinColumn(name = "training_type_id")
     private TrainingType trainingType;
 
-//    @ManyToOne
-//    private GymTrainingType gymTrainingType;
+    @OneToMany(mappedBy = "id.appointmentId", cascade = CascadeType.REMOVE)
+    private Set<ScheduledAppointment> scheduledAppointments;
 
     public Appointment(LocalDate date, LocalTime start, LocalTime end, Gym gym, TrainingType trainingType, Integer maxPeople, Integer availablePlaces){
         this.date = date;
@@ -46,6 +47,16 @@ public class Appointment {
         this.availablePlaces = availablePlaces;
     }
 
+    public Appointment(Appointment appointment){
+        this.id = appointment.getId();
+        this.date = appointment.getDate();
+        this.start = appointment.getStart();
+        this.end = appointment.getEnd();
+        this.maxPeople = appointment.getMaxPeople();
+        this.availablePlaces = appointment.getAvailablePlaces();
+        this.gym = appointment.getGym();
+        this.trainingType = appointment.getTrainingType();
+    }
     public Appointment(){
 
     }
