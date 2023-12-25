@@ -10,6 +10,6 @@ public interface ClientService {
 
     Page<ClientDto> findAll(Pageable pageable);
     ClientDto add(ClientCreateDto clientCreateDto);
-    Long scheduleAppointment(String authorization);
-    Long cancelAppointment(String authorization);
+    RoleDto scheduleAppointment(String authorization);
+    RoleDto cancelAppointment(String authorization);
 }

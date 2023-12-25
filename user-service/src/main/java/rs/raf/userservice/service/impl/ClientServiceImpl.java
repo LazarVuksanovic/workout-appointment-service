@@ -12,6 +12,7 @@ import rs.raf.userservice.dto.*;
 import rs.raf.userservice.exception.NotFoundException;
 import rs.raf.userservice.mapper.ClientMapper;
 import rs.raf.userservice.repository.ClientRepository;
+import rs.raf.userservice.repository.UserRepository;
 import rs.raf.userservice.security.service.TokenService;
 import rs.raf.userservice.service.ClientService;
 
@@ -22,11 +23,13 @@ import java.util.ArrayList;
 public class ClientServiceImpl implements ClientService {
 
     private ClientRepository clientRepository;
+    private UserRepository userRepository;
     private ClientMapper clientMapper;
     private TokenService tokenService;
 
-    public ClientServiceImpl(ClientRepository clientRepository, ClientMapper clientMapper, TokenService tokenService){
+    public ClientServiceImpl(ClientRepository clientRepository, UserRepository userRepository, ClientMapper clientMapper, TokenService tokenService){
         this.clientRepository = clientRepository;
+        this.userRepository = userRepository;
         this.clientMapper = clientMapper;
         this.tokenService = tokenService;
     }
@@ -44,22 +47,33 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Long scheduleAppointment(String authorization) {
-        Claims claims = this.tokenService.parseToken(authorization);
+    public RoleDto scheduleAppointment(String authorization) {
+        //ovo sam stelovao zbog Bearer
+        Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")));
         Client client = this.clientRepository
                 .findById(claims.get("id", Integer.class).longValue())
                 .orElseThrow(() -> new NotFoundException("greska"));
         client.setScheduledTrainings(client.getScheduledTrainings()+1);
-        return client.getId();
+        this.clientRepository.save(client);
+        RoleDto roleDto = new RoleDto();
+        roleDto.setId(client.getId());
+        roleDto.setRole(client.getRole());
+        return roleDto;
     }
 
     @Override
-    public Long cancelAppointment(String authorization) {
-        Claims claims = this.tokenService.parseToken(authorization);
+    public RoleDto cancelAppointment(String authorization) {
+        //ovo sam stelovao zbog Bearer
+        Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")));
         Client client = this.clientRepository
                 .findById(claims.get("id", Integer.class).longValue())
                 .orElseThrow(() -> new NotFoundException("greska"));
-        client.setScheduledTrainings(client.getScheduledTrainings()-1);
-        return client.getId();
+        if(client.getScheduledTrainings() > 0)
+            client.setScheduledTrainings(client.getScheduledTrainings()-1);
+        this.clientRepository.save(client);
+        RoleDto roleDto = new RoleDto();
+        roleDto.setId(client.getId());
+        roleDto.setRole(client.getRole());
+        return roleDto;
     }
 }
