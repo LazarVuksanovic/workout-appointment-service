@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import rs.raf.userservice.dto.*;
 
+import javax.management.relation.Role;
 import java.util.ArrayList;
 
 public interface ClientService {
@@ -12,4 +13,5 @@ public interface ClientService {
     ClientDto add(ClientCreateDto clientCreateDto);
     RoleDto scheduleAppointment(String authorization);
     RoleDto cancelAppointment(String authorization);
+    RoleDto managerCancelAppointment(String authorization, Integer userId);
 }

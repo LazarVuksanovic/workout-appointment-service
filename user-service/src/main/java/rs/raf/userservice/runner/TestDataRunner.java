@@ -29,7 +29,7 @@ public class TestDataRunner implements CommandLineRunner {
         admin.setPassword("admin");
         admin.setUsername("admin");
         admin.setRole("admin");
-        //unosimo korisnika
+        //unosimo korisnike
         Client client = new Client();
         client.setEmail("lvuksanovic1021rn@raf.rs");
         client.setPassword("123");
@@ -40,6 +40,16 @@ public class TestDataRunner implements CommandLineRunner {
         client.setDateOfBirth(LocalDate.of(2002, 4, 3));
         client.setScheduledTrainings(0);
         client.setMembershipCardNumber("LV03040244");
+        Client client2 = new Client();
+        client2.setEmail("lvuksanovic1021rn@raf.rs");
+        client2.setPassword("123");
+        client2.setUsername("kila2");
+        client2.setRole("client");
+        client2.setFirstName("Luka");
+        client2.setLastName("Vuksanovic");
+        client2.setDateOfBirth(LocalDate.of(2003, 9, 23));
+        client2.setScheduledTrainings(0);
+        client2.setMembershipCardNumber("LV23090314");
         //Unosimo menadzera
         GymManager gymManager = new GymManager();
         gymManager.setEmail("lvuksanovic1021rn@raf.rs");
@@ -53,6 +63,7 @@ public class TestDataRunner implements CommandLineRunner {
         gymManager.setEmploymentDate(LocalDate.now());
         this.userRepository.save(admin);
         this.userRepository.save(client);
+        this.userRepository.save(client2);
         this.userRepository.save(gymManager);
     }
 }

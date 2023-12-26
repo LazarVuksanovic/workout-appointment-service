@@ -76,4 +76,19 @@ public class ClientServiceImpl implements ClientService {
         roleDto.setRole(client.getRole());
         return roleDto;
     }
+    @Override
+    public RoleDto managerCancelAppointment(String authorization, Integer userId) {
+        //ovo sam stelovao zbog Bearer
+        Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")));
+        Client client = this.clientRepository
+                .findById(userId.longValue())
+                .orElseThrow(() -> new NotFoundException("greska"));
+        if(client.getScheduledTrainings() > 0)
+            client.setScheduledTrainings(client.getScheduledTrainings()-1);
+        this.clientRepository.save(client);
+        RoleDto roleDtoRes = new RoleDto();
+        roleDtoRes.setId(client.getId());
+        roleDtoRes.setRole(client.getRole());
+        return roleDtoRes;
+    }
 }

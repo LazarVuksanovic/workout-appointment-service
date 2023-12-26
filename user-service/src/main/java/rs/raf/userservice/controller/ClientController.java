@@ -48,4 +48,11 @@ public class ClientController {
     public ResponseEntity<RoleDto> cancelAppointment(@RequestHeader("Authorization") String authorization){
         return new ResponseEntity<>(this.clientService.cancelAppointment(authorization), HttpStatus.OK);
     }
+
+    @ApiOperation(value = "Manager deleted an appointment and cancels users scheduled appointment")
+    @PostMapping("/{id}/cancel-appointment")
+    @CheckSecurity(roles = {"admin", "gymmanager"})
+    public ResponseEntity<RoleDto> managerCancelAppointment(@RequestHeader("Authorization") String authorization, @PathVariable Integer id){
+        return new ResponseEntity<>(this.clientService.managerCancelAppointment(authorization, id), HttpStatus.OK);
+    }
 }
