@@ -21,7 +21,7 @@ public class GymController {
     @ApiOperation(value = "Edit gym")
     @PostMapping("/{id}/edit")
     public ResponseEntity<GymDto> updateGym(@RequestHeader("Authorization") String authorization,
-                                            @RequestParam Long id, @RequestBody GymUpdateDto gymUpdateDto){
+                                            @PathVariable Long id, @RequestBody GymUpdateDto gymUpdateDto){
         return new ResponseEntity<>(this.gymService.update(id, gymUpdateDto), HttpStatus.OK);
     }
 }

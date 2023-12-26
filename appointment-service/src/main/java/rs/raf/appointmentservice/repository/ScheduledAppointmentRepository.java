@@ -13,6 +13,8 @@ import java.util.List;
 
 @Repository
 public interface ScheduledAppointmentRepository extends JpaRepository<ScheduledAppointment, ScheduledAppointmentId> {
-//    @Query("SELECT s FROM ScheduledAppointment s WHERE s.id.appointmentId = :appointmentId")
-//    Page<ScheduledAppointment> findAllByAppointmentId(@Param("appointmentId") Long appointmentId, Pageable pageable);
+
+    @Query("SELECT sa FROM ScheduledAppointment sa WHERE sa.id.appointmentId = :appointmentId")
+    List<ScheduledAppointment> findAllByAppointmentId(Long appointmentId);
+
 }

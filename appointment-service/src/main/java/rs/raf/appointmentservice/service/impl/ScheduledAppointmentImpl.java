@@ -111,21 +111,8 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
         }
         //proveravamo ko je otkazao termin
         Optional<Appointment> appointment = this.appointmentRepository.findById(appointmentId.getId());
-        if(user.getBody().getRole().equals("gymmanager")){
-            appointment.get().setAvailablePlaces(0);
-            this.appointmentRepository.save(appointment.get());
-
-            // Brišemo sve povezane ScheduledAppointments
-            Appointment appointment1 = new Appointment(appointment.get());
-            this.appointmentRepository.delete(appointment.get());
-            this.appointmentRepository.save(appointment1);
-
-            // Vraćamo odgovor na osnovu uspešno obavljenih akcija
-            ScheduledAppointmentDto scheduledAppointmentDto = new ScheduledAppointmentDto();
-            scheduledAppointmentDto.setAppointmentId(appointment.get().getId());
-            scheduledAppointmentDto.setUserId(user.getBody().getId());
-            return scheduledAppointmentDto;
-        }
+        if(user.getBody().getRole().equals("gymmanager"))
+            return managerCancelAppointment(authorization, appointment.get(), user.getBody());
 
         appointment.get().setAvailablePlaces(appointment.get().getAvailablePlaces()+1);
 
@@ -153,5 +140,28 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
         //brisemo ga
         this.scheduledAppointmentRepository.delete(scheduledAppointment.get());
         return this.scheduledAppointmentMapper.scheduledAppointmentToScheduledAppointmentDto(scheduledAppointment.get());
+    }
+
+    private ScheduledAppointmentDto managerCancelAppointment(String authorization, Appointment appointment, RoleDto user){
+        appointment.setAvailablePlaces(0);
+        this.appointmentRepository.save(appointment);
+
+        //svim korisnicima smanjujemo broj zakazanih treninga i brisemo taj scheduledAppointment
+        List<ScheduledAppointment> scheduledAppointments =  this.scheduledAppointmentRepository.findAllByAppointmentId(appointment.getId());
+        scheduledAppointments.stream().forEach(scheduledAppointment -> {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", authorization);
+            // HTTP zahtev za smanjivanje broja zakazanih treninga korisnika
+            HttpEntity<RoleDto> request = new HttpEntity<>(headers);
+            this.userServiceRestTemplate.exchange("/user/client/"+scheduledAppointment.getId().getUserId()+"/cancel-appointment", HttpMethod.POST, request, RoleDto.class);
+            //brisemo zakazan termin izmedju korisnika i appointmenta
+            this.scheduledAppointmentRepository.delete(scheduledAppointment);
+        });
+
+        // Vraćamo odgovor na osnovu uspešno obavljenih akcija
+        ScheduledAppointmentDto scheduledAppointmentDto = new ScheduledAppointmentDto();
+        scheduledAppointmentDto.setAppointmentId(appointment.getId());
+        scheduledAppointmentDto.setUserId(user.getId());
+        return scheduledAppointmentDto;
     }
 }

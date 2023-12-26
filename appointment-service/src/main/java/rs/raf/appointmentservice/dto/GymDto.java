@@ -2,6 +2,9 @@ package rs.raf.appointmentservice.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import rs.raf.appointmentservice.domain.GymTrainingType;
+
+import java.util.Set;
 
 @Getter
 @Setter
