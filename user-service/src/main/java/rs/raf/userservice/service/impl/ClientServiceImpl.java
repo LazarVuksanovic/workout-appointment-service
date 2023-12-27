@@ -49,7 +49,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public RoleDto scheduleAppointment(String authorization) {
         //ovo sam stelovao zbog Bearer
-        Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")));
+        Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")).trim());
         Client client = this.clientRepository
                 .findById(claims.get("id", Integer.class).longValue())
                 .orElseThrow(() -> new NotFoundException("greska"));
@@ -64,7 +64,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public RoleDto cancelAppointment(String authorization) {
         //ovo sam stelovao zbog Bearer
-        Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")));
+        Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")).trim());
         Client client = this.clientRepository
                 .findById(claims.get("id", Integer.class).longValue())
                 .orElseThrow(() -> new NotFoundException("greska"));

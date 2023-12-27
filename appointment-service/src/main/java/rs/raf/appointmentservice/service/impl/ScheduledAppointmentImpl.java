@@ -1,8 +1,5 @@
 package rs.raf.appointmentservice.service.impl;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,7 +75,6 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
 
             HttpEntity<String> request = new HttpEntity<>(headers);
             user = this.userServiceRestTemplate.exchange("/user/client/schedule-appointment", HttpMethod.POST, request, RoleDto.class);
-
         }catch (HttpClientErrorException e) {
             if (e.getStatusCode().equals(HttpStatus.NOT_FOUND))
                 throw new NotFoundException("NEVALIDAN KORISNIK");

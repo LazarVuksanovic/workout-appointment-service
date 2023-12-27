@@ -1,14 +1,19 @@
 package rs.raf.userservice.service.impl;
 
+import io.jsonwebtoken.Claims;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import rs.raf.userservice.domain.Client;
 import rs.raf.userservice.domain.GymManager;
 import rs.raf.userservice.dto.GymManagerCreateDto;
 import rs.raf.userservice.dto.GymManagerDto;
+import rs.raf.userservice.dto.RoleDto;
+import rs.raf.userservice.exception.NotFoundException;
 import rs.raf.userservice.mapper.GymManagerMapper;
 import rs.raf.userservice.repository.GymManagerRepository;
+import rs.raf.userservice.security.service.TokenService;
 import rs.raf.userservice.service.GymManagerService;
 
 @Service
@@ -17,10 +22,12 @@ public class GymManagerServiceImpl implements GymManagerService {
 
     private GymManagerRepository gymManagerRepository;
     private GymManagerMapper gymManagerMapper;
+    private TokenService tokenService;
 
-    public GymManagerServiceImpl(GymManagerRepository gymManagerRepository, GymManagerMapper gymManagerMapper){
+    public GymManagerServiceImpl(GymManagerRepository gymManagerRepository, GymManagerMapper gymManagerMapper, TokenService tokenService){
         this.gymManagerRepository = gymManagerRepository;
         this.gymManagerMapper = gymManagerMapper;
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -33,5 +40,18 @@ public class GymManagerServiceImpl implements GymManagerService {
         GymManager gymManager = this.gymManagerMapper.gymManagerCreateDtoToGymManager(gymManagerCreateDto);
         this.gymManagerRepository.save(gymManager);
         return this.gymManagerMapper.gymManagerToGymManagerDto(gymManager);
+    }
+
+    @Override
+    public RoleDto checkIfGymManager(String authorization) {
+        //ovo sam stelovao zbog Bearer
+        Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")).trim());
+        GymManager gymManager = this.gymManagerRepository
+                .findById(claims.get("id", Integer.class).longValue())
+                .orElseThrow(() -> new NotFoundException("greska"));
+        RoleDto roleDto = new RoleDto();
+        roleDto.setId(gymManager.getId());
+        roleDto.setRole(gymManager.getRole());
+        return roleDto;
     }
 }

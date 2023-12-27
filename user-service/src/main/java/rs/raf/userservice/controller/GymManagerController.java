@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.raf.userservice.dto.GymManagerCreateDto;
 import rs.raf.userservice.dto.GymManagerDto;
+import rs.raf.userservice.dto.RoleDto;
+import rs.raf.userservice.security.CheckSecurity;
 import rs.raf.userservice.service.GymManagerService;
 
 import javax.validation.Valid;
@@ -30,5 +32,12 @@ public class GymManagerController {
     @PostMapping
     public ResponseEntity<GymManagerDto> saveGymManager(@RequestBody @Valid GymManagerCreateDto gymManagerCreateDto){
         return new ResponseEntity<>(this.gymManagerService.add(gymManagerCreateDto), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Check if gym manager")
+    @GetMapping("/check-role")
+    @CheckSecurity(roles = {"admin", "gymmanager"})
+    public ResponseEntity<RoleDto> checkIfGymManager(@RequestHeader("Authorization") String authorization){
+        return new ResponseEntity<>(this.gymManagerService.checkIfGymManager(authorization), HttpStatus.OK);
     }
 }

@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(String authorization, UserUpdateDto userUpdateDto) {
-        Claims claims = this.tokenService.parseToken(authorization);
+        Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")).trim());
         User user = this.userRepository
                 .findById(claims.get("id", Integer.class).longValue())
                 .orElseThrow(() -> new NotFoundException("greska"));
@@ -108,7 +108,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public RoleDto userId(String authorization) {
         //ovo sam stelovao zbog Bearer
-        Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")));
+        Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")).trim());
         User user = this.userRepository
                 .findById(claims.get("id", Integer.class).longValue())
                 .orElseThrow(() -> new NotFoundException("greska"));
