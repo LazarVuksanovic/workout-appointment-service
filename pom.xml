@@ -12,6 +12,7 @@
     <modules>
         <module>user-service</module>
         <module>appointment-service</module>
+        <module>message-service</module>
     </modules>
 
     <properties>
