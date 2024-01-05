@@ -9,4 +9,5 @@ public interface UserService {
     BannedUserDto banUser(String authorization, BannedUserDto bannedUserDto);
     BannedUserDto unbanUser(String authorization, BannedUserDto bannedUserDto);
     UserDto userId(String authorization);
+    UserDto onlyAdmin(String authorization);
 }

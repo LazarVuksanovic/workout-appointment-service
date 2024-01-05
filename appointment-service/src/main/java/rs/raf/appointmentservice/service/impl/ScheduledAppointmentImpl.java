@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import rs.raf.appointmentservice.client.messageservice.dto.MessageCreateDto;
-import rs.raf.appointmentservice.client.messageservice.dto.MessageType;
 import rs.raf.appointmentservice.client.userservice.dto.IdDto;
 import rs.raf.appointmentservice.client.userservice.dto.UserDto;
 import rs.raf.appointmentservice.domain.Appointment;
@@ -102,7 +101,7 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
             //pravimo poruku
             MessageCreateDto messageCreateDto = new MessageCreateDto();
             messageCreateDto.setText("TEKST PORUKEEEEE");
-            messageCreateDto.setMessageType(MessageType.SUCCESSFULLY_SCHEDULED);
+            messageCreateDto.setMessageType("SUCCESSFULLY_SCHEDULED");
             messageCreateDto.setUserId(user.getBody().getId());
             messageCreateDto.setEmail(user.getBody().getEmail());
             messageCreateDto.setTimeSent(LocalDateTime.now());

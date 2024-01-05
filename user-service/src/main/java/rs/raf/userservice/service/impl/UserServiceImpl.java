@@ -115,4 +115,14 @@ public class UserServiceImpl implements UserService {
         UserDto userDto = this.userMapper.userToUserDto(user);
         return userDto;
     }
+
+    @Override
+    public UserDto onlyAdmin(String authorization) {
+        //ovo sam stelovao zbog Bearer
+        Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")).trim());
+        User user = this.userRepository
+                .findById(claims.get("id", Integer.class).longValue())
+                .orElseThrow(() -> new NotFoundException("greska"));
+        return this.userMapper.userToUserDto(user);
+    }
 }

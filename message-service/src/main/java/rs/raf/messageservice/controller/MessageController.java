@@ -10,6 +10,8 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.web.bind.annotation.*;
 import rs.raf.messageservice.dto.MessageCreateDto;
 import rs.raf.messageservice.dto.MessageDto;
+import rs.raf.messageservice.dto.MessageTypeDto;
+import rs.raf.messageservice.dto.MessageTypeUpdateDto;
 import rs.raf.messageservice.listener.helper.MessageHelper;
 import rs.raf.messageservice.service.MessageService;
 
@@ -38,8 +40,37 @@ public class MessageController {
 
     @ApiOperation(value = "Send messages")
     @PostMapping
-    public ResponseEntity<MessageDto> sendMessage(@RequestBody MessageCreateDto messageCreateDto){
+    public ResponseEntity<MessageCreateDto> sendMessage(@RequestBody MessageCreateDto messageCreateDto){
         this.jmsTemplate.convertAndSend(this.messageDestination, this.messageHelper.createTextMessage(messageCreateDto));
         return new ResponseEntity<>(this.messageService.addMessage(messageCreateDto), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Find all message types")
+    @GetMapping("/type")
+    public ResponseEntity<Page<MessageTypeDto>> findAllMessageTypes(@RequestHeader("Authorization") String authorization,
+                                                                    Pageable pageable){
+        return new ResponseEntity<>(this.messageService.findAllMessageTypes("Bearer " + authorization, pageable), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Edit message type")
+    @PostMapping("/type/{messageType}")
+    public ResponseEntity<MessageTypeDto> updateMessageType(@RequestHeader("Authorization") String authorization,
+                                                            @PathVariable String messageType,
+                                                            @RequestBody MessageTypeUpdateDto messageTypeUpdateDto){
+        return new ResponseEntity<>(this.messageService.updateMessageType("Bearer " + authorization, messageType, messageTypeUpdateDto), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Delete message type")
+    @PostMapping("/type/{messageType}/delete")
+    public ResponseEntity<MessageTypeDto> deleteMessageType(@RequestHeader("Authorization") String authorization,
+                                                            @PathVariable String messageType){
+        return new ResponseEntity<>(this.messageService.deleteMessageType("Bearer " + authorization, messageType), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Add message type")
+    @PostMapping("/type")
+    public ResponseEntity<MessageTypeDto> addMessageType(@RequestHeader("Authorization") String authorization,
+                                                            @RequestBody MessageTypeDto messageTypeDto){
+        return new ResponseEntity<>(this.messageService.addMessageType("Bearer " + authorization, messageTypeDto), HttpStatus.OK);
     }
 }

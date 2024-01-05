@@ -32,6 +32,7 @@ public class SecurityAspect {
         //Get method signature
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Method method = methodSignature.getMethod();
+
         //Check for authorization parameter
         String token = null;
         for (int i = 0; i < methodSignature.getParameterNames().length; i++) {
@@ -47,6 +48,7 @@ public class SecurityAspect {
         if (token == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+
         //Try to parse token
         Claims claims = this.tokenService.parseToken(token);
         //If fails return UNAUTHORIZED response

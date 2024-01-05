@@ -55,4 +55,11 @@ public class UserController {
     public ResponseEntity<UserDto> userId(@RequestHeader("Authorization") String authorization){
         return new ResponseEntity<>(this.userService.userId(authorization), HttpStatus.OK);
     }
+
+    @ApiOperation(value = "Checks if admin")
+    @GetMapping("/only-admin")
+    @CheckSecurity(roles = {"admin"})
+    public ResponseEntity<UserDto> onlyAdmin(@RequestHeader("Authorization") String authorization){
+        return new ResponseEntity<>(this.userService.onlyAdmin(authorization), HttpStatus.OK);
+    }
 }
