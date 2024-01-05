@@ -11,6 +11,9 @@ public class MessageMapper {
         MessageDto messageDto = new MessageDto();
         messageDto.setMessageType(message.getMessageType());
         messageDto.setText(message.getText());
+        messageDto.setUserId(message.getUserId());
+        messageDto.setEmail(message.getEmail());
+        messageDto.setTimeSent(message.getTimeSent());
         return messageDto;
     }
 }

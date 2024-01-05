@@ -33,6 +33,8 @@ public class MessageServiceImpl implements MessageService {
         Message message = new Message();
         message.setMessageType(messageCreateDto.getMessageType());
         message.setText(messageCreateDto.getText());
+        message.setUserId(messageCreateDto.getUserId());
+        message.setEmail(messageCreateDto.getEmail());
         this.messageRepository.save(message);
         return this.messageMapper.messageToMessageDto(message);
     }

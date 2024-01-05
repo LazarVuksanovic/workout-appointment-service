@@ -21,6 +21,7 @@ import rs.raf.appointmentservice.repository.AppointmentRepository;
 import rs.raf.appointmentservice.repository.ScheduledAppointmentRepository;
 import rs.raf.appointmentservice.service.ScheduledAppointmentService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,7 +103,9 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
             MessageCreateDto messageCreateDto = new MessageCreateDto();
             messageCreateDto.setText("TEKST PORUKEEEEE");
             messageCreateDto.setMessageType(MessageType.SUCCESSFULLY_SCHEDULED);
-            messageCreateDto.setUser(user.getBody());
+            messageCreateDto.setUserId(user.getBody().getId());
+            messageCreateDto.setEmail(user.getBody().getEmail());
+            messageCreateDto.setTimeSent(LocalDateTime.now());
 
             HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
             this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);
