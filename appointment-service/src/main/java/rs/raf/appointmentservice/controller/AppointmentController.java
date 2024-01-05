@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import rs.raf.appointmentservice.client.userservice.dto.RoleDto;
+import rs.raf.appointmentservice.client.userservice.dto.IdDto;
 import rs.raf.appointmentservice.dto.AppointmentDto;
 import rs.raf.appointmentservice.dto.FilterDto;
 import rs.raf.appointmentservice.dto.ScheduledAppointmentDto;
@@ -33,14 +33,14 @@ public class AppointmentController {
     @ApiOperation(value = "Schedule an appointment")
     @PostMapping("/schedule")
     public ResponseEntity<ScheduledAppointmentDto> scheduleAppointment(@RequestHeader("Authorization") String authorization,
-                                                                       @RequestBody RoleDto appointmentId){
+                                                                       @RequestBody IdDto appointmentId){
         return new ResponseEntity<>(this.scheduledAppointmentService.scheduleAppointment("Bearer " + authorization, appointmentId), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Cancel an appointment")
     @PostMapping("/cancel")
     public ResponseEntity<ScheduledAppointmentDto> cancelAppointment(@RequestHeader("Authorization") String authorization,
-                                                                       @RequestBody RoleDto roleDto){
-        return new ResponseEntity<>(this.scheduledAppointmentService.cancelAppointment("Bearer " + authorization, roleDto), HttpStatus.OK);
+                                                                       @RequestBody IdDto idDto){
+        return new ResponseEntity<>(this.scheduledAppointmentService.cancelAppointment("Bearer " + authorization, idDto), HttpStatus.OK);
     }
 }

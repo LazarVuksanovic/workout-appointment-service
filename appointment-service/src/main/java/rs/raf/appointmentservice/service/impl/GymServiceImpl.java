@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import rs.raf.appointmentservice.client.userservice.dto.RoleDto;
+import rs.raf.appointmentservice.client.userservice.dto.IdDto;
 import rs.raf.appointmentservice.domain.Gym;
 import rs.raf.appointmentservice.domain.GymTrainingType;
 import rs.raf.appointmentservice.domain.TrainingType;
@@ -53,7 +53,7 @@ public class GymServiceImpl implements GymService {
             headers.set("Authorization", authorization);
 
             HttpEntity<String> request = new HttpEntity<>(headers);
-            this.userServiceRestTemplate.exchange("/user/gymmanager/check-role", HttpMethod.GET, request, RoleDto.class);
+            this.userServiceRestTemplate.exchange("/user/gymmanager/check-role", HttpMethod.GET, request, IdDto.class);
         }catch (HttpClientErrorException e){
             if(e.getStatusCode().equals(HttpStatus.NOT_FOUND))
                 throw new NotFoundException("NEVALIDAN KORISNIK");
@@ -72,7 +72,7 @@ public class GymServiceImpl implements GymService {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", authorization);
             HttpEntity<String> request = new HttpEntity<>(headers);
-            this.userServiceRestTemplate.exchange("/user/gymmanager/check-role", HttpMethod.GET, request, RoleDto.class);
+            this.userServiceRestTemplate.exchange("/user/gymmanager/check-role", HttpMethod.GET, request, IdDto.class);
         }catch (HttpClientErrorException e){
             if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED) || e.getStatusCode().equals(HttpStatus.FORBIDDEN)) {
                 throw new UnauthorizedException("Korisnik nema dozvolu za pristup.");
@@ -98,7 +98,7 @@ public class GymServiceImpl implements GymService {
             headers.set("Authorization", authorization);
 
             HttpEntity<String> request = new HttpEntity<>(headers);
-            this.userServiceRestTemplate.exchange("/user/gymmanager/check-role", HttpMethod.GET, request, RoleDto.class);
+            this.userServiceRestTemplate.exchange("/user/gymmanager/check-role", HttpMethod.GET, request, IdDto.class);
         }catch (HttpClientErrorException e){
             if(e.getStatusCode().equals(HttpStatus.NOT_FOUND))
                 throw new NotFoundException("NEVALIDAN KORISNIK");

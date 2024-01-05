@@ -9,6 +9,8 @@ public class MessageMapper {
 
     public MessageDto messageToMessageDto(Message message){
         MessageDto messageDto = new MessageDto();
+        messageDto.setMessageType(message.getMessageType());
+        messageDto.setText(message.getText());
         return messageDto;
     }
 }

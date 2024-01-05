@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.raf.userservice.dto.GymManagerCreateDto;
 import rs.raf.userservice.dto.GymManagerDto;
-import rs.raf.userservice.dto.RoleDto;
+import rs.raf.userservice.dto.IdDto;
 import rs.raf.userservice.security.CheckSecurity;
 import rs.raf.userservice.service.GymManagerService;
 
@@ -37,7 +37,7 @@ public class GymManagerController {
     @ApiOperation(value = "Check if gym manager")
     @GetMapping("/check-role")
     @CheckSecurity(roles = {"admin", "gymmanager"})
-    public ResponseEntity<RoleDto> checkIfGymManager(@RequestHeader("Authorization") String authorization){
+    public ResponseEntity<IdDto> checkIfGymManager(@RequestHeader("Authorization") String authorization){
         return new ResponseEntity<>(this.gymManagerService.checkIfGymManager(authorization), HttpStatus.OK);
     }
 }

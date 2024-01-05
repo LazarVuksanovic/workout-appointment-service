@@ -52,7 +52,7 @@ public class UserController {
     @ApiOperation(value = "User id from token")
     @GetMapping("/id")
     @CheckSecurity(roles = {"admin", "client", "gymmanager"})
-    public ResponseEntity<RoleDto> userId(@RequestHeader("Authorization") String authorization){
+    public ResponseEntity<UserDto> userId(@RequestHeader("Authorization") String authorization){
         return new ResponseEntity<>(this.userService.userId(authorization), HttpStatus.OK);
     }
 }

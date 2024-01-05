@@ -5,11 +5,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import rs.raf.userservice.domain.Client;
 import rs.raf.userservice.domain.GymManager;
 import rs.raf.userservice.dto.GymManagerCreateDto;
 import rs.raf.userservice.dto.GymManagerDto;
-import rs.raf.userservice.dto.RoleDto;
+import rs.raf.userservice.dto.IdDto;
 import rs.raf.userservice.exception.NotFoundException;
 import rs.raf.userservice.mapper.GymManagerMapper;
 import rs.raf.userservice.repository.GymManagerRepository;
@@ -43,15 +42,14 @@ public class GymManagerServiceImpl implements GymManagerService {
     }
 
     @Override
-    public RoleDto checkIfGymManager(String authorization) {
+    public IdDto checkIfGymManager(String authorization) {
         //ovo sam stelovao zbog Bearer
         Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")).trim());
         GymManager gymManager = this.gymManagerRepository
                 .findById(claims.get("id", Integer.class).longValue())
                 .orElseThrow(() -> new NotFoundException("greska"));
-        RoleDto roleDto = new RoleDto();
-        roleDto.setId(gymManager.getId());
-        roleDto.setRole(gymManager.getRole());
-        return roleDto;
+        IdDto idDto = new IdDto();
+        idDto.setId(gymManager.getId());
+        return idDto;
     }
 }

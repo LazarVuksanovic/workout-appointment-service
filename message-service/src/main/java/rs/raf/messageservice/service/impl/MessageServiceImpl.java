@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import rs.raf.messageservice.domain.Message;
 import rs.raf.messageservice.dto.MessageCreateDto;
 import rs.raf.messageservice.dto.MessageDto;
 import rs.raf.messageservice.mapper.MessageMapper;
@@ -29,6 +30,10 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public MessageDto addMessage(MessageCreateDto messageCreateDto) {
-        return null;
+        Message message = new Message();
+        message.setMessageType(messageCreateDto.getMessageType());
+        message.setText(messageCreateDto.getText());
+        this.messageRepository.save(message);
+        return this.messageMapper.messageToMessageDto(message);
     }
 }

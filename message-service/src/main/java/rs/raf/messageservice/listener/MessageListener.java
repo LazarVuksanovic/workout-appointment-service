@@ -23,7 +23,7 @@ public class MessageListener {
     @JmsListener(destination = "${destination.sendMessage}", concurrency = "5-10")
     public void addMessage(Message message) throws JMSException {
         MessageCreateDto messageCreateDto = this.messageHelper.getMessage(message, MessageCreateDto.class);
-        this.messageService.addMessage(messageCreateDto);
+        System.out.println("LISTENER PRINT\n=================\n" + messageCreateDto.getText());
     }
 }
 

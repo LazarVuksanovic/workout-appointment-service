@@ -8,8 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.raf.userservice.dto.ClientCreateDto;
 import rs.raf.userservice.dto.ClientDto;
-import rs.raf.userservice.dto.RoleDto;
-import rs.raf.userservice.dto.UserUpdateDto;
+import rs.raf.userservice.dto.IdDto;
 import rs.raf.userservice.security.CheckSecurity;
 import rs.raf.userservice.service.ClientService;
 
@@ -38,21 +37,21 @@ public class ClientController {
     @ApiOperation(value = "User schedule appointment")
     @PostMapping("/schedule-appointment")
     @CheckSecurity(roles = {"admin", "client"})
-    public ResponseEntity<RoleDto> scheduleAppointment(@RequestHeader("Authorization") String authorization){
+    public ResponseEntity<IdDto> scheduleAppointment(@RequestHeader("Authorization") String authorization){
         return new ResponseEntity<>(this.clientService.scheduleAppointment(authorization), HttpStatus.OK);
     }
 
     @ApiOperation(value = "User cancel appointment")
     @PostMapping("/cancel-appointment")
     @CheckSecurity(roles = {"admin", "client", "gymmanager"})
-    public ResponseEntity<RoleDto> cancelAppointment(@RequestHeader("Authorization") String authorization){
+    public ResponseEntity<IdDto> cancelAppointment(@RequestHeader("Authorization") String authorization){
         return new ResponseEntity<>(this.clientService.cancelAppointment(authorization), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Manager deleted an appointment and cancels users scheduled appointment")
     @PostMapping("/{id}/cancel-appointment")
     @CheckSecurity(roles = {"admin", "gymmanager"})
-    public ResponseEntity<RoleDto> managerCancelAppointment(@RequestHeader("Authorization") String authorization, @PathVariable Integer id){
+    public ResponseEntity<IdDto> managerCancelAppointment(@RequestHeader("Authorization") String authorization, @PathVariable Integer id){
         return new ResponseEntity<>(this.clientService.managerCancelAppointment(authorization, id), HttpStatus.OK);
     }
 }

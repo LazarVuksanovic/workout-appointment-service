@@ -16,4 +16,5 @@ public class UserDto {
     private String firstName;
     private String lastName;
     private LocalDate dateOfBirth;
+    private String role;
 }

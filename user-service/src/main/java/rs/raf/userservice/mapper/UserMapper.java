@@ -15,14 +15,15 @@ import java.util.Random;
 public class UserMapper {
 
     public UserDto userToUserDto(User user) {
-        UserDto clientDto = new UserDto();
-        clientDto.setId(user.getId());
-        clientDto.setEmail(user.getEmail());
-        clientDto.setFirstName(user.getFirstName());
-        clientDto.setLastName(user.getLastName());
-        clientDto.setUsername(user.getUsername());
-        clientDto.setDateOfBirth(user.getDateOfBirth());
-        return clientDto;
+        UserDto userDto = new UserDto();
+        userDto.setId(user.getId());
+        userDto.setEmail(user.getEmail());
+        userDto.setFirstName(user.getFirstName());
+        userDto.setLastName(user.getLastName());
+        userDto.setUsername(user.getUsername());
+        userDto.setDateOfBirth(user.getDateOfBirth());
+        userDto.setRole(user.getRole());
+        return userDto;
     }
 
     public void UserUpdateDtoToUser(User user, UserUpdateDto userUpdateDto){

@@ -106,15 +106,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public RoleDto userId(String authorization) {
+    public UserDto userId(String authorization) {
         //ovo sam stelovao zbog Bearer
         Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")).trim());
         User user = this.userRepository
                 .findById(claims.get("id", Integer.class).longValue())
                 .orElseThrow(() -> new NotFoundException("greska"));
-        RoleDto roleDto = new RoleDto();
-        roleDto.setId(user.getId());
-        roleDto.setRole(user.getRole());
-        return roleDto;
+        UserDto userDto = this.userMapper.userToUserDto(user);
+        return userDto;
     }
 }

@@ -44,7 +44,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public RoleDto scheduleAppointment(String authorization) {
+    public IdDto scheduleAppointment(String authorization) {
         //ovo sam stelovao zbog Bearer
         Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")).trim());
         Client client = this.clientRepository
@@ -52,14 +52,13 @@ public class ClientServiceImpl implements ClientService {
                 .orElseThrow(() -> new NotFoundException("greska"));
         client.setScheduledTrainings(client.getScheduledTrainings()+1);
         this.clientRepository.save(client);
-        RoleDto roleDto = new RoleDto();
-        roleDto.setId(client.getId());
-        roleDto.setRole(client.getRole());
-        return roleDto;
+        IdDto idDto = new IdDto();
+        idDto.setId(client.getId());
+        return idDto;
     }
 
     @Override
-    public RoleDto cancelAppointment(String authorization) {
+    public IdDto cancelAppointment(String authorization) {
         //ovo sam stelovao zbog Bearer
         Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")).trim());
         Client client = this.clientRepository
@@ -68,13 +67,12 @@ public class ClientServiceImpl implements ClientService {
         if(client.getScheduledTrainings() > 0)
             client.setScheduledTrainings(client.getScheduledTrainings()-1);
         this.clientRepository.save(client);
-        RoleDto roleDto = new RoleDto();
-        roleDto.setId(client.getId());
-        roleDto.setRole(client.getRole());
-        return roleDto;
+        IdDto idDto = new IdDto();
+        idDto.setId(client.getId());
+        return idDto;
     }
     @Override
-    public RoleDto managerCancelAppointment(String authorization, Integer userId) {
+    public IdDto managerCancelAppointment(String authorization, Integer userId) {
         //ovo sam stelovao zbog Bearer
         Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")));
         Client client = this.clientRepository
@@ -83,9 +81,8 @@ public class ClientServiceImpl implements ClientService {
         if(client.getScheduledTrainings() > 0)
             client.setScheduledTrainings(client.getScheduledTrainings()-1);
         this.clientRepository.save(client);
-        RoleDto roleDtoRes = new RoleDto();
-        roleDtoRes.setId(client.getId());
-        roleDtoRes.setRole(client.getRole());
-        return roleDtoRes;
+        IdDto idDtoRes = new IdDto();
+        idDtoRes.setId(client.getId());
+        return idDtoRes;
     }
 }
