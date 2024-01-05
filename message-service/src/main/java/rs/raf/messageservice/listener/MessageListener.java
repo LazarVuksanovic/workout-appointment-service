@@ -10,18 +10,18 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 
 @Component
-public class OrderListener {
+public class MessageListener {
 
     private MessageHelper messageHelper;
     private MessageService messageService;
 
-    public OrderListener(MessageHelper messageHelper, MessageService messageService) {
+    public MessageListener(MessageHelper messageHelper, MessageService messageService) {
         this.messageHelper = messageHelper;
         this.messageService = messageService;
     }
 
     @JmsListener(destination = "${destination.sendMessage}", concurrency = "5-10")
-    public void addOrder(Message message) throws JMSException {
+    public void addMessage(Message message) throws JMSException {
         MessageCreateDto messageCreateDto = this.messageHelper.getMessage(message, MessageCreateDto.class);
         this.messageService.addMessage(messageCreateDto);
     }

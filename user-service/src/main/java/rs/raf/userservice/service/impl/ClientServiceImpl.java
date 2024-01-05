@@ -2,7 +2,6 @@ package rs.raf.userservice.service.impl;
 
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,8 +14,6 @@ import rs.raf.userservice.repository.ClientRepository;
 import rs.raf.userservice.repository.UserRepository;
 import rs.raf.userservice.security.service.TokenService;
 import rs.raf.userservice.service.ClientService;
-
-import java.util.ArrayList;
 
 @Service
 @Transactional
