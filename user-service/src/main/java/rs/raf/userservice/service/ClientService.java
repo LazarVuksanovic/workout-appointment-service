@@ -10,5 +10,5 @@ public interface ClientService {
     ClientDto add(ClientCreateDto clientCreateDto);
     IdDto scheduleAppointment(String authorization);
     IdDto cancelAppointment(String authorization);
-    IdDto managerCancelAppointment(String authorization, Integer userId);
+    UserDto managerCancelAppointment(String authorization, Integer userId);
 }

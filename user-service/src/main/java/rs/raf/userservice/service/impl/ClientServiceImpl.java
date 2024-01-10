@@ -2,18 +2,29 @@ package rs.raf.userservice.service.impl;
 
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+import rs.raf.userservice.client.messageservice.dto.MessageCreateDto;
 import rs.raf.userservice.domain.Client;
 import rs.raf.userservice.dto.*;
 import rs.raf.userservice.exception.NotFoundException;
 import rs.raf.userservice.mapper.ClientMapper;
+import rs.raf.userservice.mapper.UserMapper;
 import rs.raf.userservice.repository.ClientRepository;
 import rs.raf.userservice.repository.UserRepository;
 import rs.raf.userservice.security.service.TokenService;
 import rs.raf.userservice.service.ClientService;
+
+import java.time.LocalDateTime;
 
 @Service
 @Transactional
@@ -22,13 +33,19 @@ public class ClientServiceImpl implements ClientService {
     private ClientRepository clientRepository;
     private UserRepository userRepository;
     private ClientMapper clientMapper;
+    private UserMapper userMapper;
     private TokenService tokenService;
+    private RestTemplate messageServiceRestTemplate;
 
-    public ClientServiceImpl(ClientRepository clientRepository, UserRepository userRepository, ClientMapper clientMapper, TokenService tokenService){
+    public ClientServiceImpl(ClientRepository clientRepository, UserRepository userRepository,
+                             ClientMapper clientMapper, TokenService tokenService, UserMapper userMapper,
+                             RestTemplate messageServiceRestTemplate){
         this.clientRepository = clientRepository;
         this.userRepository = userRepository;
         this.clientMapper = clientMapper;
+        this.userMapper = userMapper;
         this.tokenService = tokenService;
+        this.messageServiceRestTemplate = messageServiceRestTemplate;
     }
 
     @Override
@@ -40,6 +57,31 @@ public class ClientServiceImpl implements ClientService {
     public ClientDto add(ClientCreateDto clientCreateDto) {
         Client client = this.clientMapper.clientCreateDtoToClient(clientCreateDto);
         this.clientRepository.save(client);
+
+        //pravimo token
+        Claims claims = Jwts.claims();
+        claims.put("id", client.getId());
+        claims.put("role", client.getRole());
+        String authorization = this.tokenService.generate(claims);
+
+        //pravim poruku za aktivaciju mejla i saljemo
+        try{
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", authorization);
+            //pravimo poruku
+            MessageCreateDto messageCreateDto = new MessageCreateDto();
+            messageCreateDto.setMessageType("EMAIL_ACTIVATION");
+            messageCreateDto.setUserId(client.getId());
+            messageCreateDto.setEmail(client.getEmail());
+            messageCreateDto.setTimeSent(LocalDateTime.now());
+
+            HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
+            this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);
+        }catch (HttpClientErrorException e) {
+            if (e.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                throw new NotFoundException("NEVALIDAN KORISNIK");
+        }
+
         return this.clientMapper.clientToClientDto(client);
     }
 
@@ -72,7 +114,7 @@ public class ClientServiceImpl implements ClientService {
         return idDto;
     }
     @Override
-    public IdDto managerCancelAppointment(String authorization, Integer userId) {
+    public UserDto managerCancelAppointment(String authorization, Integer userId) {
         //ovo sam stelovao zbog Bearer
         Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")));
         Client client = this.clientRepository
@@ -81,8 +123,8 @@ public class ClientServiceImpl implements ClientService {
         if(client.getScheduledTrainings() > 0)
             client.setScheduledTrainings(client.getScheduledTrainings()-1);
         this.clientRepository.save(client);
-        IdDto idDtoRes = new IdDto();
-        idDtoRes.setId(client.getId());
-        return idDtoRes;
+        UserDto userDtoRes = this.userMapper.userToUserDto(client);
+        userDtoRes.setId(client.getId());
+        return userDtoRes;
     }
 }

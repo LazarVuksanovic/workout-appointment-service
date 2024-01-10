@@ -100,7 +100,6 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
             headers.set("Authorization", authorization);
             //pravimo poruku
             MessageCreateDto messageCreateDto = new MessageCreateDto();
-            messageCreateDto.setText("TEKST PORUKEEEEE");
             messageCreateDto.setMessageType("SUCCESSFULLY_SCHEDULED");
             messageCreateDto.setUserId(user.getBody().getId());
             messageCreateDto.setEmail(user.getBody().getEmail());
@@ -133,7 +132,7 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
         //proveravamo ko je otkazao termin
         Optional<Appointment> appointment = this.appointmentRepository.findById(appointmentId.getId());
         if(user.getBody().getRole().equals("gymmanager"))
-            return managerCancelAppointment(authorization, appointment.get(), user.getBody());
+            return managerCancelAppointment(authorization, appointment.get(), user.getBody().getId());
 
         appointment.get().setAvailablePlaces(appointment.get().getAvailablePlaces()+1);
 
@@ -158,12 +157,30 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
                 throw new NotFoundException("NEVALIDAN KORISNIK");
         }
 
+        //pravim poruku i saljemo
+        try{
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", authorization);
+            //pravimo poruku
+            MessageCreateDto messageCreateDto = new MessageCreateDto();
+            messageCreateDto.setMessageType("CANCELED_APPOINTMENT");
+            messageCreateDto.setUserId(user.getBody().getId());
+            messageCreateDto.setEmail(user.getBody().getEmail());
+            messageCreateDto.setTimeSent(LocalDateTime.now());
+
+            HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
+            this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);
+        }catch (HttpClientErrorException e) {
+            if (e.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                throw new NotFoundException("NEVALIDAN KORISNIK");
+        }
+
         //brisemo ga
         this.scheduledAppointmentRepository.delete(scheduledAppointment.get());
         return this.scheduledAppointmentMapper.scheduledAppointmentToScheduledAppointmentDto(scheduledAppointment.get());
     }
 
-    private ScheduledAppointmentDto managerCancelAppointment(String authorization, Appointment appointment, UserDto user){
+    private ScheduledAppointmentDto managerCancelAppointment(String authorization, Appointment appointment, Long managerId){
         appointment.setAvailablePlaces(0);
         this.appointmentRepository.save(appointment);
 
@@ -174,7 +191,20 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
             headers.set("Authorization", authorization);
             // HTTP zahtev za smanjivanje broja zakazanih treninga korisnika
             HttpEntity<IdDto> request = new HttpEntity<>(headers);
-            this.userServiceRestTemplate.exchange("/user/client/"+scheduledAppointment.getId().getUserId()+"/cancel-appointment", HttpMethod.POST, request, IdDto.class);
+            ResponseEntity<UserDto> user =  this.userServiceRestTemplate.exchange("/user/client/"+scheduledAppointment.getId().getUserId()+"/cancel-appointment", HttpMethod.POST, request, UserDto.class);
+
+            //pravim poruku i saljemo
+            headers = new HttpHeaders();
+            headers.set("Authorization", authorization);
+            MessageCreateDto messageCreateDto = new MessageCreateDto();
+            messageCreateDto.setMessageType("CANCELED_APPOINTMENT");
+            messageCreateDto.setUserId(user.getBody().getId());
+            messageCreateDto.setEmail(user.getBody().getEmail());
+            messageCreateDto.setTimeSent(LocalDateTime.now());
+
+            HttpEntity<MessageCreateDto> request2 = new HttpEntity<>(messageCreateDto, headers);
+            this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request2, MessageCreateDto.class);
+
             //brisemo zakazan termin izmedju korisnika i appointmenta
             this.scheduledAppointmentRepository.delete(scheduledAppointment);
         });
@@ -182,7 +212,7 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
         // Vraćamo odgovor na osnovu uspešno obavljenih akcija
         ScheduledAppointmentDto scheduledAppointmentDto = new ScheduledAppointmentDto();
         scheduledAppointmentDto.setAppointmentId(appointment.getId());
-        scheduledAppointmentDto.setUserId(user.getId());
+        scheduledAppointmentDto.setUserId(managerId);
         return scheduledAppointmentDto;
     }
 }

@@ -2,8 +2,15 @@ package rs.raf.userservice.service.impl;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+import rs.raf.userservice.client.messageservice.dto.MessageCreateDto;
 import rs.raf.userservice.domain.BannedUser;
 import rs.raf.userservice.domain.GymManager;
 import rs.raf.userservice.domain.User;
@@ -17,6 +24,7 @@ import rs.raf.userservice.repository.UserRepository;
 import rs.raf.userservice.security.service.TokenService;
 import rs.raf.userservice.service.UserService;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -28,14 +36,17 @@ public class UserServiceImpl implements UserService {
     private TokenService tokenService;
     private BannedUserRepository bannedUserRepository;
     private BannedUserMapper bannedUserMapper;
+    private RestTemplate messageServiceRestTemplate;
 
     public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, TokenService tokenService,
-                           BannedUserRepository bannedUserRepository, BannedUserMapper bannedUserMapper){
+                           BannedUserRepository bannedUserRepository, BannedUserMapper bannedUserMapper,
+                           RestTemplate messageServiceRestTemplate){
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.tokenService = tokenService;
         this.bannedUserRepository = bannedUserRepository;
         this.bannedUserMapper = bannedUserMapper;
+        this.messageServiceRestTemplate = messageServiceRestTemplate;
     }
 
     @Override
@@ -56,6 +67,38 @@ public class UserServiceImpl implements UserService {
         claims.put("role", user.getRole());
         //Generate token
         return new TokenResponseDto(this.tokenService.generate(claims));
+    }
+
+    @Override
+    public TokenResponseDto resetPassword(String authorization, ResetPasswordDto resetPasswordDto) {
+        Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")).trim());
+        User user = this.userRepository
+                .findById(claims.get("id", Integer.class).longValue())
+                .orElseThrow(() -> new NotFoundException("greska"));
+        if(user.getPassword().equals(resetPasswordDto.getOldPassword())){
+            //setujemo novu sifru
+            user.setPassword(resetPasswordDto.getNewPassword());
+
+            //pravim poruku za aktivaciju mejla i saljemo
+            try{
+                HttpHeaders headers = new HttpHeaders();
+                headers.set("Authorization", authorization);
+                //pravimo poruku
+                MessageCreateDto messageCreateDto = new MessageCreateDto();
+                messageCreateDto.setMessageType("RESET_PASSWORD");
+                messageCreateDto.setUserId(user.getId());
+                messageCreateDto.setEmail(user.getEmail());
+                messageCreateDto.setTimeSent(LocalDateTime.now());
+
+                HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
+                this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);
+            }catch (HttpClientErrorException e) {
+                if (e.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                    throw new NotFoundException("NEVALIDAN KORISNIK");
+            }
+        }
+        this.userRepository.save(user);
+        return new TokenResponseDto(authorization);
     }
 
 

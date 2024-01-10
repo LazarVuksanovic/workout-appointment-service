@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Setter
 public class MessageCreateDto {
 
-    private String text;
     private String messageType;
     private Long userId;
     private String email;

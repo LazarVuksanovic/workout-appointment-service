@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import rs.raf.userservice.domain.GymManager;
 import rs.raf.userservice.dto.GymManagerCreateDto;
 import rs.raf.userservice.dto.GymManagerDto;
@@ -22,11 +23,14 @@ public class GymManagerServiceImpl implements GymManagerService {
     private GymManagerRepository gymManagerRepository;
     private GymManagerMapper gymManagerMapper;
     private TokenService tokenService;
+    private RestTemplate messageServiceRestTemplate;
 
-    public GymManagerServiceImpl(GymManagerRepository gymManagerRepository, GymManagerMapper gymManagerMapper, TokenService tokenService){
+    public GymManagerServiceImpl(GymManagerRepository gymManagerRepository, GymManagerMapper gymManagerMapper,
+                                 TokenService tokenService, RestTemplate messageServiceRestTemplate){
         this.gymManagerRepository = gymManagerRepository;
         this.gymManagerMapper = gymManagerMapper;
         this.tokenService = tokenService;
+        this.messageServiceRestTemplate = messageServiceRestTemplate;
     }
 
     @Override

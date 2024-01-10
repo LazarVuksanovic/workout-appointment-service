@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import rs.raf.userservice.dto.ClientCreateDto;
 import rs.raf.userservice.dto.ClientDto;
 import rs.raf.userservice.dto.IdDto;
+import rs.raf.userservice.dto.UserDto;
 import rs.raf.userservice.security.CheckSecurity;
 import rs.raf.userservice.service.ClientService;
 
@@ -51,7 +52,7 @@ public class ClientController {
     @ApiOperation(value = "Manager deleted an appointment and cancels users scheduled appointment")
     @PostMapping("/{id}/cancel-appointment")
     @CheckSecurity(roles = {"admin", "gymmanager"})
-    public ResponseEntity<IdDto> managerCancelAppointment(@RequestHeader("Authorization") String authorization, @PathVariable Integer id){
+    public ResponseEntity<UserDto> managerCancelAppointment(@RequestHeader("Authorization") String authorization, @PathVariable Integer id){
         return new ResponseEntity<>(this.clientService.managerCancelAppointment(authorization, id), HttpStatus.OK);
     }
 }

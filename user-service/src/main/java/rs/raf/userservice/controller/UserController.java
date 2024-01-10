@@ -26,6 +26,13 @@ public class UserController {
         return new ResponseEntity<>(this.userService.login(tokenRequestDto), HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Reset password")
+    @PostMapping("/reset-password")
+    public ResponseEntity<TokenResponseDto> resetPassword(@RequestHeader("Authorization") String authorization,
+                                                          ResetPasswordDto resetPasswordDto){
+        return new ResponseEntity<>(this.userService.resetPassword(authorization, resetPasswordDto), HttpStatus.OK);
+    }
+
     @ApiOperation(value = "Edit user")
     @PostMapping("/edit")
     public ResponseEntity<UserDto> updateClient(@RequestHeader("Authorization") String authorization,
