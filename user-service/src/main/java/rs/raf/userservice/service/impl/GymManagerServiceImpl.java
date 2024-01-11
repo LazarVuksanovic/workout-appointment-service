@@ -1,11 +1,18 @@
 package rs.raf.userservice.service.impl;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import rs.raf.userservice.client.messageservice.dto.MessageCreateDto;
 import rs.raf.userservice.domain.GymManager;
 import rs.raf.userservice.dto.GymManagerCreateDto;
 import rs.raf.userservice.dto.GymManagerDto;
@@ -15,6 +22,8 @@ import rs.raf.userservice.mapper.GymManagerMapper;
 import rs.raf.userservice.repository.GymManagerRepository;
 import rs.raf.userservice.security.service.TokenService;
 import rs.raf.userservice.service.GymManagerService;
+
+import java.time.LocalDateTime;
 
 @Service
 @Transactional
@@ -41,6 +50,32 @@ public class GymManagerServiceImpl implements GymManagerService {
     @Override
     public GymManagerDto add(GymManagerCreateDto gymManagerCreateDto) {
         GymManager gymManager = this.gymManagerMapper.gymManagerCreateDtoToGymManager(gymManagerCreateDto);
+
+        //pravimo token
+        Claims claims = Jwts.claims();
+        claims.put("id", gymManager.getId());
+        claims.put("role", gymManager.getRole());
+        String authorization = this.tokenService.generate(claims);
+
+        //pravim poruku za aktivaciju mejla i saljemo
+        try{
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", authorization);
+            //pravimo poruku
+            MessageCreateDto messageCreateDto = new MessageCreateDto();
+            messageCreateDto.setMessageType("EMAIL_ACTIVATION");
+            messageCreateDto.setUserId(gymManager.getId());
+            messageCreateDto.setEmail(gymManager.getEmail());
+            messageCreateDto.setTimeSent(LocalDateTime.now());
+            messageCreateDto.setFirstName(gymManager.getFirstName());
+
+            HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
+            this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);
+        }catch (HttpClientErrorException e) {
+            if (e.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                throw new NotFoundException("NEVALIDAN KORISNIK");
+        }
+
         this.gymManagerRepository.save(gymManager);
         return this.gymManagerMapper.gymManagerToGymManagerDto(gymManager);
     }

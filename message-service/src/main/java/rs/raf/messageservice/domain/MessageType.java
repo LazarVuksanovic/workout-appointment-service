@@ -2,6 +2,7 @@ package rs.raf.messageservice.domain;
 
 import lombok.Getter;
 import lombok.Setter;
+import rs.raf.messageservice.dto.MessageCreateDto;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -24,5 +25,14 @@ public class MessageType {
     }
 
     public MessageType(){
+    }
+
+    public String mapValuesToText(MessageCreateDto message){
+        String finalText = this.text;
+        finalText = finalText.replace("{user_name}", message.getFirstName());
+        finalText = finalText.replace("{date}", message.getAppointmentDate().toString());
+        finalText = finalText.replace("{time}", message.getAppointmentTime().toString());
+        finalText = finalText.replace("{place}", message.getAppointmentPlace());
+        return finalText;
     }
 }

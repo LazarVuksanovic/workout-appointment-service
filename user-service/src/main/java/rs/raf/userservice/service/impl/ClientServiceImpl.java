@@ -74,6 +74,7 @@ public class ClientServiceImpl implements ClientService {
             messageCreateDto.setUserId(client.getId());
             messageCreateDto.setEmail(client.getEmail());
             messageCreateDto.setTimeSent(LocalDateTime.now());
+            messageCreateDto.setFirstName(client.getFirstName());
 
             HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
             this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);

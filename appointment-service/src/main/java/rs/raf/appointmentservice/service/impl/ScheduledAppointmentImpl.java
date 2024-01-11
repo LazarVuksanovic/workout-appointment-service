@@ -104,6 +104,10 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
             messageCreateDto.setUserId(user.getBody().getId());
             messageCreateDto.setEmail(user.getBody().getEmail());
             messageCreateDto.setTimeSent(LocalDateTime.now());
+            messageCreateDto.setAppointmentTime(appointment.get().getStart());
+            messageCreateDto.setAppointmentDate(appointment.get().getDate());
+            messageCreateDto.setAppointmentPlace(appointment.get().getGym().getName());
+            messageCreateDto.setFirstName(user.getBody().getFirstName());
 
             HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
             this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);
@@ -167,6 +171,10 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
             messageCreateDto.setUserId(user.getBody().getId());
             messageCreateDto.setEmail(user.getBody().getEmail());
             messageCreateDto.setTimeSent(LocalDateTime.now());
+            messageCreateDto.setAppointmentTime(appointment.get().getStart());
+            messageCreateDto.setAppointmentDate(appointment.get().getDate());
+            messageCreateDto.setAppointmentPlace(appointment.get().getGym().getName());
+            messageCreateDto.setFirstName(user.getBody().getFirstName());
 
             HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
             this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);
@@ -201,6 +209,10 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
             messageCreateDto.setUserId(user.getBody().getId());
             messageCreateDto.setEmail(user.getBody().getEmail());
             messageCreateDto.setTimeSent(LocalDateTime.now());
+            messageCreateDto.setAppointmentTime(appointment.getStart());
+            messageCreateDto.setAppointmentDate(appointment.getDate());
+            messageCreateDto.setAppointmentPlace(appointment.getGym().getName());
+            messageCreateDto.setFirstName(user.getBody().getFirstName());
 
             HttpEntity<MessageCreateDto> request2 = new HttpEntity<>(messageCreateDto, headers);
             this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request2, MessageCreateDto.class);

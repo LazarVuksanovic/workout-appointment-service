@@ -89,6 +89,7 @@ public class UserServiceImpl implements UserService {
                 messageCreateDto.setUserId(user.getId());
                 messageCreateDto.setEmail(user.getEmail());
                 messageCreateDto.setTimeSent(LocalDateTime.now());
+                messageCreateDto.setFirstName(user.getFirstName());
 
                 HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
                 this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);
