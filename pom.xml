@@ -13,6 +13,8 @@
         <module>user-service</module>
         <module>appointment-service</module>
         <module>message-service</module>
+        <module>api-gateway</module>
+        <module>eureka-service</module>
     </modules>
 
     <properties>
