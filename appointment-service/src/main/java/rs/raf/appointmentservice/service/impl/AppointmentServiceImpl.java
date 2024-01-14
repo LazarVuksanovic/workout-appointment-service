@@ -11,6 +11,7 @@ import rs.raf.appointmentservice.dto.FilterDto;
 import rs.raf.appointmentservice.mapper.AppointmentMapper;
 import rs.raf.appointmentservice.repository.AppointmentRepository;
 import rs.raf.appointmentservice.repository.GymRepository;
+import rs.raf.appointmentservice.repository.ScheduledAppointmentRepository;
 import rs.raf.appointmentservice.repository.TrainingTypeRepository;
 import rs.raf.appointmentservice.service.AppointmentService;
 
@@ -27,20 +28,23 @@ public class AppointmentServiceImpl implements AppointmentService {
     private AppointmentMapper appointmentMapper;
     private GymRepository gymRepository;
     private TrainingTypeRepository trainingTypeRepository;
+    private ScheduledAppointmentRepository scheduledAppointmentRepository;
 
     public AppointmentServiceImpl(AppointmentRepository appointmentRepository, AppointmentMapper appointmentMapper,
-                                  GymRepository gymRepository, TrainingTypeRepository trainingTypeRepository){
+                                  GymRepository gymRepository, TrainingTypeRepository trainingTypeRepository,
+                                  ScheduledAppointmentRepository scheduledAppointmentRepository){
         this.appointmentRepository = appointmentRepository;
         this.appointmentMapper = appointmentMapper;
         this.gymRepository = gymRepository;
         this.trainingTypeRepository = trainingTypeRepository;
+        this.scheduledAppointmentRepository = scheduledAppointmentRepository;
     }
 
     @Override
     public Page<AppointmentDto> findAll(Pageable pageable, FilterDto filterDto) {
         Page<Appointment> appointments = this.appointmentRepository.findAll(pageable);
         List<Appointment> appointmentsList =  appointments.stream()
-                .filter(appointment -> filterByTrainingType(appointment, filterDto.getTrainingTypeId()))
+                .filter(appointment -> filterByTrainingType(appointment, filterDto.getTrainingTypes()))
                 .filter(appointment -> filterByIsIndividual(appointment, filterDto.getIsIndividual()))
                 .filter(appointment -> filterByDayOfWeek(appointment, filterDto.getDayOfWeek()))
                 .filter(appointment -> appointment.getAvailablePlaces() > 0)
@@ -48,15 +52,15 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointments = new PageImpl<>(appointmentsList, pageable, appointmentsList.size());
         return appointments.map(appointment ->{
             AppointmentDto appointmentDto = this.appointmentMapper.appointmentToAppointmentDto(appointment);
-            appointmentDto.setTrainingTypeName(this.trainingTypeRepository.findById(appointmentDto.getGymId().longValue()).get().getName());
-            appointmentDto.setGymName(this.gymRepository.findById(appointmentDto.getGymId().longValue()).get().getName());
+            appointmentDto.setTrainingTypeName(this.trainingTypeRepository.findById(appointmentDto.getTrainingTypeId()).get().getName());
+            appointmentDto.setGymName(this.gymRepository.findById(appointmentDto.getGymId()).get().getName());
             return appointmentDto;
         });
     }
 
     // Filtriranje po trainingTypeId
-    private boolean filterByTrainingType(Appointment appointment, List<Long> trainingTypeId) {
-        return trainingTypeId == null || trainingTypeId.contains(appointment.getTrainingType().getId());
+    private boolean filterByTrainingType(Appointment appointment, String trainingTypes) {
+        return trainingTypes == null || trainingTypes.contains(appointment.getTrainingType().getName());
     }
 
     // Filtriranje po isIndividual

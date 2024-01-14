@@ -28,6 +28,7 @@ public class AppointmentController {
     @ApiOperation(value = "Find all appointments")
     @PostMapping()
     public ResponseEntity<Page<AppointmentDto>> findAll(Pageable pageable, @RequestBody FilterDto filterDto){
+        System.out.println(filterDto.toString());
         return new ResponseEntity<>(this.appointmentService.findAll(pageable, filterDto), HttpStatus.OK);
     }
     @ApiOperation(value = "Schedule an appointment")

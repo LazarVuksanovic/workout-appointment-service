@@ -83,11 +83,10 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
         sa.forEach(scheduledAppointment -> {
             AppointmentDto a = appointmentMapper.appointmentToAppointmentDto(this.appointmentRepository.findById(scheduledAppointment.getId().getAppointmentId()).get());
             a.setGymName(this.gymRepository.findById(a.getGymId()).get().getName());
-            a.setTrainingTypeName(this.trainingTypeRepository.findById(a.getTrainingTypeId().longValue()).get().getName());
+            a.setTrainingTypeName(this.trainingTypeRepository.findById(a.getTrainingTypeId()).get().getName());
             userAppointmentsList.add(a);
         });
-        Page<AppointmentDto> userAppointmentsPage = new PageImpl<>(userAppointmentsList, pageable, userAppointmentsList.size());
-        return userAppointmentsPage;
+        return new PageImpl<>(userAppointmentsList, pageable, userAppointmentsList.size());
     }
 
     @Override

@@ -2,6 +2,7 @@ package rs.raf.appointmentservice.controller;
 
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,12 @@ public class TrainingTypeController {
     }
 
     @ApiOperation(value = "Get training types")
+    @GetMapping("/")
+    public ResponseEntity<Page<TrainingTypeDto>> findAll(Pageable pageable, @RequestHeader("Authorization") String authorization){
+        return new ResponseEntity<>(this.trainingTypeService.findAll(pageable, authorization), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Get training type")
     @GetMapping("/{id}")
     public ResponseEntity<TrainingTypeDto> trainingType(@RequestHeader("Authorization") String authorization,
                                                               @PathVariable Long id){

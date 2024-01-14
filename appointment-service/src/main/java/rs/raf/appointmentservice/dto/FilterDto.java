@@ -10,7 +10,16 @@ import java.util.List;
 @Setter
 public class FilterDto {
 
-    private List<Long> TrainingTypeId;
+    private String trainingTypes;
     private Integer isIndividual;
     private DayOfWeek dayOfWeek;
+
+    @Override
+    public String toString() {
+        return "FilterDto{" +
+                "TrainingTypes='" + trainingTypes + '\'' +
+                ", isIndividual=" + isIndividual +
+                ", dayOfWeek=" + dayOfWeek +
+                '}';
+    }
 }

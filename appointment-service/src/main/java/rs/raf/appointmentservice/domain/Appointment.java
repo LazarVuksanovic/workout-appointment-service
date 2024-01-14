@@ -60,4 +60,19 @@ public class Appointment {
     public Appointment(){
 
     }
+
+    @Override
+    public String toString() {
+        return "Appointment{" +
+                "id=" + id +
+                ", date=" + date +
+                ", start=" + start +
+                ", end=" + end +
+                ", maxPeople=" + maxPeople +
+                ", availablePlaces=" + availablePlaces +
+                ", gym=" + gym +
+                ", trainingType=" + trainingType +
+                ", scheduledAppointments=" + scheduledAppointments +
+                '}';
+    }
 }

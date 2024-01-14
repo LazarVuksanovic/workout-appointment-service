@@ -29,4 +29,14 @@ public class TrainingType {
 
     public TrainingType(){
     }
+
+    @Override
+    public String toString() {
+        return "TrainingType{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", gymTrainingTypes=" + gymTrainingTypes +
+                ", isIndividual=" + isIndividual +
+                '}';
+    }
 }
