@@ -10,6 +10,8 @@ import rs.raf.appointmentservice.dto.AppointmentDto;
 import rs.raf.appointmentservice.dto.FilterDto;
 import rs.raf.appointmentservice.mapper.AppointmentMapper;
 import rs.raf.appointmentservice.repository.AppointmentRepository;
+import rs.raf.appointmentservice.repository.GymRepository;
+import rs.raf.appointmentservice.repository.TrainingTypeRepository;
 import rs.raf.appointmentservice.service.AppointmentService;
 
 import java.time.DayOfWeek;
@@ -23,10 +25,15 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     private AppointmentRepository appointmentRepository;
     private AppointmentMapper appointmentMapper;
+    private GymRepository gymRepository;
+    private TrainingTypeRepository trainingTypeRepository;
 
-    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, AppointmentMapper appointmentMapper){
+    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, AppointmentMapper appointmentMapper,
+                                  GymRepository gymRepository, TrainingTypeRepository trainingTypeRepository){
         this.appointmentRepository = appointmentRepository;
         this.appointmentMapper = appointmentMapper;
+        this.gymRepository = gymRepository;
+        this.trainingTypeRepository = trainingTypeRepository;
     }
 
     @Override
@@ -39,7 +46,12 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .filter(appointment -> appointment.getAvailablePlaces() > 0)
                 .collect(Collectors.toList());
         appointments = new PageImpl<>(appointmentsList, pageable, appointmentsList.size());
-        return appointments.map(appointmentMapper::appointmentToAppointmentDto);
+        return appointments.map(appointment ->{
+            AppointmentDto appointmentDto = this.appointmentMapper.appointmentToAppointmentDto(appointment);
+            appointmentDto.setTrainingTypeName(this.trainingTypeRepository.findById(appointmentDto.getGymId().longValue()).get().getName());
+            appointmentDto.setGymName(this.gymRepository.findById(appointmentDto.getGymId().longValue()).get().getName());
+            return appointmentDto;
+        });
     }
 
     // Filtriranje po trainingTypeId

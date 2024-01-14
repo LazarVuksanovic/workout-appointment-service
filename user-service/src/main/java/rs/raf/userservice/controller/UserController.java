@@ -23,7 +23,6 @@ public class UserController {
     @ApiOperation(value = "Login user")
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDto> loginClient(@RequestBody @Valid TokenRequestDto tokenRequestDto){
-        System.out.println("uso:" + tokenRequestDto.getUsername()+"  "+tokenRequestDto.getPassword());
         return new ResponseEntity<>(this.userService.login(tokenRequestDto), HttpStatus.OK);
     }
 

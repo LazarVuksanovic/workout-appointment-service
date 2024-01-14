@@ -18,4 +18,6 @@ public class AppointmentDto {
     private Integer availablePlaces;
     private Long gymId;
     private Long trainingTypeId;
+    private String gymName;
+    private String trainingTypeName;
 }

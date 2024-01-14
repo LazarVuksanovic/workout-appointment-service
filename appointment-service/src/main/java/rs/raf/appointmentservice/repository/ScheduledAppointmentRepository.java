@@ -16,5 +16,7 @@ public interface ScheduledAppointmentRepository extends JpaRepository<ScheduledA
 
     @Query("SELECT sa FROM ScheduledAppointment sa WHERE sa.id.appointmentId = :appointmentId")
     List<ScheduledAppointment> findAllByAppointmentId(Long appointmentId);
+    @Query("SELECT sa FROM ScheduledAppointment sa WHERE sa.id.userId = :userId")
+    List<ScheduledAppointment> findUserAppointments(Long userId);
 
 }

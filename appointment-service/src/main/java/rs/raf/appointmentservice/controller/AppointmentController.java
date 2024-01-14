@@ -26,21 +26,29 @@ public class AppointmentController {
     }
 
     @ApiOperation(value = "Find all appointments")
-    @GetMapping()
-    public ResponseEntity<Page<AppointmentDto>> findAll(Pageable pageable, FilterDto filterDto){
+    @PostMapping()
+    public ResponseEntity<Page<AppointmentDto>> findAll(Pageable pageable, @RequestBody FilterDto filterDto){
         return new ResponseEntity<>(this.appointmentService.findAll(pageable, filterDto), HttpStatus.OK);
     }
     @ApiOperation(value = "Schedule an appointment")
     @PostMapping("/schedule")
     public ResponseEntity<ScheduledAppointmentDto> scheduleAppointment(@RequestHeader("Authorization") String authorization,
                                                                        @RequestBody IdDto appointmentId){
-        return new ResponseEntity<>(this.scheduledAppointmentService.scheduleAppointment("Bearer " + authorization, appointmentId), HttpStatus.OK);
+        return new ResponseEntity<>(this.scheduledAppointmentService.scheduleAppointment(authorization, appointmentId), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Cancel an appointment")
     @PostMapping("/cancel")
     public ResponseEntity<ScheduledAppointmentDto> cancelAppointment(@RequestHeader("Authorization") String authorization,
                                                                        @RequestBody IdDto idDto){
-        return new ResponseEntity<>(this.scheduledAppointmentService.cancelAppointment("Bearer " + authorization, idDto), HttpStatus.OK);
+        return new ResponseEntity<>(this.scheduledAppointmentService.cancelAppointment(authorization, idDto), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Find user appointments")
+    @GetMapping("/user-appointments")
+    public ResponseEntity<Page<AppointmentDto>> findUserAppointments(Pageable pageable,
+                                                                     @RequestHeader("Authorization") String authorization){
+        //FilterDto filterDto
+        return new ResponseEntity<>(this.scheduledAppointmentService.findUserAppointments(pageable, authorization, null), HttpStatus.OK);
     }
 }

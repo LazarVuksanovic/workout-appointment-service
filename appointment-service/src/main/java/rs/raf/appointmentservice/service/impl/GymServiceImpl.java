@@ -47,6 +47,11 @@ public class GymServiceImpl implements GymService {
     }
 
     @Override
+    public GymDto getGym(String authorization, Long id) {
+        return this.gymMapper.gymToGymDto(this.gymRepository.findById(id).get());
+    }
+
+    @Override
     public GymDto update(String authorization, Long id, GymUpdateDto gymUpdateDto) {
         try {
             HttpHeaders headers = new HttpHeaders();

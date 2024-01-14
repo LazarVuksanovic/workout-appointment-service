@@ -1,5 +1,8 @@
 package rs.raf.appointmentservice.service.impl;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,38 +14,80 @@ import rs.raf.appointmentservice.client.userservice.dto.UserDto;
 import rs.raf.appointmentservice.domain.Appointment;
 import rs.raf.appointmentservice.domain.ScheduledAppointment;
 import rs.raf.appointmentservice.domain.ScheduledAppointmentId;
+import rs.raf.appointmentservice.dto.AppointmentDto;
+import rs.raf.appointmentservice.dto.FilterDto;
 import rs.raf.appointmentservice.dto.ScheduledAppointmentDto;
 import rs.raf.appointmentservice.exception.AlreadyScheduledException;
 import rs.raf.appointmentservice.exception.AppointmentNotAvailableException;
 import rs.raf.appointmentservice.exception.NotFoundException;
+import rs.raf.appointmentservice.mapper.AppointmentMapper;
 import rs.raf.appointmentservice.mapper.ScheduledAppointmentMapper;
 import rs.raf.appointmentservice.repository.AppointmentRepository;
+import rs.raf.appointmentservice.repository.GymRepository;
 import rs.raf.appointmentservice.repository.ScheduledAppointmentRepository;
+import rs.raf.appointmentservice.repository.TrainingTypeRepository;
 import rs.raf.appointmentservice.service.ScheduledAppointmentService;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
 
     private AppointmentRepository appointmentRepository;
+    private AppointmentMapper appointmentMapper;
     private ScheduledAppointmentRepository scheduledAppointmentRepository;
     private ScheduledAppointmentMapper scheduledAppointmentMapper;
     private RestTemplate userServiceRestTemplate;
     private RestTemplate messageServiceRestTemplate;
+    private GymRepository gymRepository;
+    private TrainingTypeRepository trainingTypeRepository;
 
     public ScheduledAppointmentImpl(AppointmentRepository appointmentRepository,
+                                    AppointmentMapper appointmentMapper,
                                     ScheduledAppointmentRepository scheduledAppointmentRepository,
                                     ScheduledAppointmentMapper scheduledAppointmentMapper,
-                                    RestTemplate userServiceRestTemplate, RestTemplate messageServiceRestTemplate){
+                                    RestTemplate userServiceRestTemplate, RestTemplate messageServiceRestTemplate,
+                                    GymRepository gymRepository, TrainingTypeRepository trainingTypeRepository){
         this.appointmentRepository = appointmentRepository;
+        this.appointmentMapper = appointmentMapper;
         this.scheduledAppointmentRepository = scheduledAppointmentRepository;
         this.scheduledAppointmentMapper = scheduledAppointmentMapper;
         this.userServiceRestTemplate = userServiceRestTemplate;
         this.messageServiceRestTemplate = messageServiceRestTemplate;
+        this.gymRepository = gymRepository;
+        this.trainingTypeRepository = trainingTypeRepository;
+    }
+
+    @Override
+    public Page<AppointmentDto> findUserAppointments(Pageable pageable, String authorization, FilterDto filterDto) {
+        ResponseEntity<UserDto> user = null;
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", authorization);
+
+            HttpEntity<String> request = new HttpEntity<>(headers);
+            user = this.userServiceRestTemplate.exchange("/user/id", HttpMethod.GET, request, UserDto.class);
+        }catch (HttpClientErrorException e){
+            if(e.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                throw new NotFoundException("NEVALIDAN KORISNIK");
+        }
+
+        List<ScheduledAppointment> sa = this.scheduledAppointmentRepository.findUserAppointments(user.getBody().getId().longValue());
+        List<AppointmentDto> userAppointmentsList = new ArrayList<>();
+        sa.forEach(scheduledAppointment -> {
+            AppointmentDto a = appointmentMapper.appointmentToAppointmentDto(this.appointmentRepository.findById(scheduledAppointment.getId().getAppointmentId()).get());
+            a.setGymName(this.gymRepository.findById(a.getGymId()).get().getName());
+            a.setTrainingTypeName(this.trainingTypeRepository.findById(a.getTrainingTypeId().longValue()).get().getName());
+            userAppointmentsList.add(a);
+        });
+        Page<AppointmentDto> userAppointmentsPage = new PageImpl<>(userAppointmentsList, pageable, userAppointmentsList.size());
+        return userAppointmentsPage;
     }
 
     @Override
@@ -227,4 +272,20 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
         scheduledAppointmentDto.setUserId(managerId);
         return scheduledAppointmentDto;
     }
+
+//    private boolean filterByTrainingType(Appointment appointment, List<Long> trainingTypeId) {
+//        return trainingTypeId == null || trainingTypeId.contains(appointment.getTrainingType().getId());
+//    }
+//
+//    // Filtriranje po isIndividual
+//    private boolean filterByIsIndividual(Appointment appointment, Integer isIndividual) {
+//        if (isIndividual == null)
+//            return true;
+//        return (isIndividual == 1) == (appointment.getMaxPeople() == 1);
+//    }
+//
+//    // Filtriranje po danu u nedelji
+//    private boolean filterByDayOfWeek(Appointment appointment, DayOfWeek dayOfWeek) {
+//        return dayOfWeek == null || appointment.getDate().getDayOfWeek().equals(dayOfWeek);
+//    }
 }

@@ -1,13 +1,11 @@
 package rs.raf.appointmentservice.controller;
 
 import io.swagger.annotations.ApiOperation;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import rs.raf.appointmentservice.dto.GymDto;
-import rs.raf.appointmentservice.dto.GymTrainingTypeDto;
-import rs.raf.appointmentservice.dto.GymUpdateDto;
-import rs.raf.appointmentservice.dto.NewGymTrainingTypeDto;
+import rs.raf.appointmentservice.dto.*;
 import rs.raf.appointmentservice.service.GymService;
 
 @RestController
@@ -18,6 +16,13 @@ public class GymController {
 
     public GymController(GymService gymService){
         this.gymService = gymService;
+    }
+
+    @ApiOperation(value = "Get gym")
+    @GetMapping("/{id}")
+    public ResponseEntity<GymDto> updateGym(@RequestHeader("Authorization") String authorization,
+                                            @PathVariable Long id){
+        return new ResponseEntity<>(this.gymService.getGym(authorization, id), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Edit gym")
