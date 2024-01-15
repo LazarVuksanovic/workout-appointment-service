@@ -28,7 +28,6 @@ public class UserMapper {
 
     public void UserUpdateDtoToUser(User user, UserUpdateDto userUpdateDto){
         user.setUsername(userUpdateDto.getUsername());
-        user.setPassword(userUpdateDto.getPassword());
         user.setEmail(userUpdateDto.getEmail());
         user.setFirstName(userUpdateDto.getFirstName());
         user.setLastName(userUpdateDto.getLastName());

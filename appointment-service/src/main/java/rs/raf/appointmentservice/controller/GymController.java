@@ -29,7 +29,7 @@ public class GymController {
     @PostMapping("/{id}/edit")
     public ResponseEntity<GymDto> updateGym(@RequestHeader("Authorization") String authorization,
                                             @PathVariable Long id, @RequestBody GymUpdateDto gymUpdateDto){
-        return new ResponseEntity<>(this.gymService.update("Bearer " + authorization, id, gymUpdateDto), HttpStatus.OK);
+        return new ResponseEntity<>(this.gymService.update(authorization, id, gymUpdateDto), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Add training type to a gym")

@@ -1,5 +1,7 @@
 package rs.raf.userservice.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import rs.raf.userservice.dto.*;
 
 public interface UserService {
@@ -11,4 +13,5 @@ public interface UserService {
     BannedUserDto unbanUser(String authorization, BannedUserDto bannedUserDto);
     UserDto userId(String authorization);
     UserDto onlyAdmin(String authorization);
+    Page<UserDto> findAll(Pageable pageable, String authorization);
 }

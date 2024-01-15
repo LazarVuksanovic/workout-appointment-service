@@ -9,10 +9,7 @@ import rs.raf.appointmentservice.domain.Appointment;
 import rs.raf.appointmentservice.dto.AppointmentDto;
 import rs.raf.appointmentservice.dto.FilterDto;
 import rs.raf.appointmentservice.mapper.AppointmentMapper;
-import rs.raf.appointmentservice.repository.AppointmentRepository;
-import rs.raf.appointmentservice.repository.GymRepository;
-import rs.raf.appointmentservice.repository.ScheduledAppointmentRepository;
-import rs.raf.appointmentservice.repository.TrainingTypeRepository;
+import rs.raf.appointmentservice.repository.*;
 import rs.raf.appointmentservice.service.AppointmentService;
 
 import java.time.DayOfWeek;
@@ -29,15 +26,18 @@ public class AppointmentServiceImpl implements AppointmentService {
     private GymRepository gymRepository;
     private TrainingTypeRepository trainingTypeRepository;
     private ScheduledAppointmentRepository scheduledAppointmentRepository;
+    private GymTrainingTypeRepository gymTrainingTypeRepository;
 
     public AppointmentServiceImpl(AppointmentRepository appointmentRepository, AppointmentMapper appointmentMapper,
                                   GymRepository gymRepository, TrainingTypeRepository trainingTypeRepository,
-                                  ScheduledAppointmentRepository scheduledAppointmentRepository){
+                                  ScheduledAppointmentRepository scheduledAppointmentRepository,
+                                  GymTrainingTypeRepository gymTrainingTypeRepository){
         this.appointmentRepository = appointmentRepository;
         this.appointmentMapper = appointmentMapper;
         this.gymRepository = gymRepository;
         this.trainingTypeRepository = trainingTypeRepository;
         this.scheduledAppointmentRepository = scheduledAppointmentRepository;
+        this.gymTrainingTypeRepository = gymTrainingTypeRepository;
     }
 
     @Override
@@ -54,6 +54,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             AppointmentDto appointmentDto = this.appointmentMapper.appointmentToAppointmentDto(appointment);
             appointmentDto.setTrainingTypeName(this.trainingTypeRepository.findById(appointmentDto.getTrainingTypeId()).get().getName());
             appointmentDto.setGymName(this.gymRepository.findById(appointmentDto.getGymId()).get().getName());
+            appointmentDto.setPrice(this.gymTrainingTypeRepository.findByGymIdAndTrainingTypeId(appointment.getGym().getId(), appointment.getTrainingType().getId()).get().getPrice());
             return appointmentDto;
         });
     }

@@ -2,6 +2,8 @@ package rs.raf.userservice.service.impl;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -24,7 +26,9 @@ import rs.raf.userservice.repository.UserRepository;
 import rs.raf.userservice.security.service.TokenService;
 import rs.raf.userservice.service.UserService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
 
 @Service
@@ -78,7 +82,6 @@ public class UserServiceImpl implements UserService {
         if(user.getPassword().equals(resetPasswordDto.getOldPassword())){
             //setujemo novu sifru
             user.setPassword(resetPasswordDto.getNewPassword());
-
             //pravim poruku za aktivaciju mejla i saljemo
             try{
                 HttpHeaders headers = new HttpHeaders();
@@ -90,6 +93,9 @@ public class UserServiceImpl implements UserService {
                 messageCreateDto.setEmail(user.getEmail());
                 messageCreateDto.setTimeSent(LocalDateTime.now());
                 messageCreateDto.setFirstName(user.getFirstName());
+                messageCreateDto.setAppointmentDate(LocalDate.now());
+                messageCreateDto.setAppointmentPlace("");
+                messageCreateDto.setAppointmentTime(LocalTime.now());
 
                 HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
                 this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);
@@ -157,6 +163,7 @@ public class UserServiceImpl implements UserService {
                 .findById(claims.get("id", Integer.class).longValue())
                 .orElseThrow(() -> new NotFoundException("greska"));
         UserDto userDto = this.userMapper.userToUserDto(user);
+        userDto.setBanned(this.bannedUserRepository.findById(user.getId()).isPresent());
         return userDto;
     }
 
@@ -168,5 +175,15 @@ public class UserServiceImpl implements UserService {
                 .findById(claims.get("id", Integer.class).longValue())
                 .orElseThrow(() -> new NotFoundException("greska"));
         return this.userMapper.userToUserDto(user);
+    }
+
+    @Override
+    public Page<UserDto> findAll(Pageable pageable, String authorization) {
+        Page<UserDto> users = this.userRepository.findAll(pageable).map(this.userMapper::userToUserDto);
+        users.map(user -> {
+            user.setBanned(this.bannedUserRepository.findById(user.getId()).isPresent());
+            return user;
+        });
+        return users;
     }
 }

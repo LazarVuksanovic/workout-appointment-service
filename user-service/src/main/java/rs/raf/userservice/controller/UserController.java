@@ -1,6 +1,8 @@
 package rs.raf.userservice.controller;
 
 import io.swagger.annotations.ApiOperation;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +11,7 @@ import rs.raf.userservice.security.CheckSecurity;
 import rs.raf.userservice.service.UserService;
 
 import javax.validation.Valid;
+
 
 @RestController
 @RequestMapping("/user")
@@ -20,6 +23,13 @@ public class UserController {
         this.userService = userService;
     }
 
+    @ApiOperation(value = "Get all users")
+    @GetMapping()
+    @CheckSecurity(roles = {"admin"})
+    public ResponseEntity<Page<UserDto>> findAll(Pageable pageable, @RequestHeader("Authorization") String authorization){
+        return new ResponseEntity<>(this.userService.findAll(pageable, authorization), HttpStatus.OK);
+    }
+
     @ApiOperation(value = "Login user")
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDto> loginClient(@RequestBody @Valid TokenRequestDto tokenRequestDto){
@@ -29,7 +39,7 @@ public class UserController {
     @ApiOperation(value = "Reset password")
     @PostMapping("/reset-password")
     public ResponseEntity<TokenResponseDto> resetPassword(@RequestHeader("Authorization") String authorization,
-                                                          ResetPasswordDto resetPasswordDto){
+                                                          @RequestBody ResetPasswordDto resetPasswordDto){
         return new ResponseEntity<>(this.userService.resetPassword(authorization, resetPasswordDto), HttpStatus.OK);
     }
 

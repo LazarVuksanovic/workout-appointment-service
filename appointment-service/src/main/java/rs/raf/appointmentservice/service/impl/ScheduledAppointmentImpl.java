@@ -78,7 +78,7 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
                 throw new NotFoundException("NEVALIDAN KORISNIK");
         }
 
-        List<ScheduledAppointment> sa = this.scheduledAppointmentRepository.findUserAppointments(user.getBody().getId().longValue());
+        List<ScheduledAppointment> sa = this.scheduledAppointmentRepository.findUserAppointments(user.getBody().getId());
         List<AppointmentDto> userAppointmentsList = new ArrayList<>();
         sa.forEach(scheduledAppointment -> {
             AppointmentDto a = appointmentMapper.appointmentToAppointmentDto(this.appointmentRepository.findById(scheduledAppointment.getId().getAppointmentId()).get());

@@ -3,6 +3,7 @@ package rs.raf.appointmentservice.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -20,4 +21,5 @@ public class AppointmentDto {
     private Long trainingTypeId;
     private String gymName;
     private String trainingTypeName;
+    private BigDecimal price;
 }
