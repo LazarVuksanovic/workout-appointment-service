@@ -29,6 +29,7 @@ public class TestDataRunner implements CommandLineRunner {
         admin.setPassword("admin");
         admin.setUsername("admin");
         admin.setRole("admin");
+        admin.setVerified(true);
         //unosimo korisnike
         Client client = new Client();
         client.setEmail("lvuksanovic1021rn@raf.rs");
@@ -40,6 +41,7 @@ public class TestDataRunner implements CommandLineRunner {
         client.setDateOfBirth(LocalDate.of(2002, 4, 3));
         client.setScheduledTrainings(0);
         client.setMembershipCardNumber("LV03040244");
+        client.setVerified(true);
         Client client2 = new Client();
         client2.setEmail("lvuksanovic1021rn@raf.rs");
         client2.setPassword("123");
@@ -50,6 +52,7 @@ public class TestDataRunner implements CommandLineRunner {
         client2.setDateOfBirth(LocalDate.of(2003, 9, 23));
         client2.setScheduledTrainings(0);
         client2.setMembershipCardNumber("LV23090314");
+        client2.setVerified(false);
         //Unosimo menadzera
         GymManager gymManager = new GymManager();
         gymManager.setEmail("lvuksanovic1021rn@raf.rs");
@@ -61,6 +64,7 @@ public class TestDataRunner implements CommandLineRunner {
         gymManager.setDateOfBirth(LocalDate.of(1999, 4, 3));
         gymManager.setGymName("IRON REPUBLIC");
         gymManager.setEmploymentDate(LocalDate.now());
+        gymManager.setVerified(true);
         this.userRepository.save(admin);
         this.userRepository.save(client);
         this.userRepository.save(client2);

@@ -33,6 +33,7 @@ public class MessageType {
         finalText = finalText.replace("{date}", message.getAppointmentDate().toString());
         finalText = finalText.replace("{time}", message.getAppointmentTime().toString());
         finalText = finalText.replace("{place}", message.getAppointmentPlace());
+        finalText = finalText.replace("{link}", "http//localhost:3000/email-verification/" + message.getLink());
         return finalText;
     }
 }

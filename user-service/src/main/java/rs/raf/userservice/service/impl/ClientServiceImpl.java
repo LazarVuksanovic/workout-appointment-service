@@ -24,7 +24,9 @@ import rs.raf.userservice.repository.UserRepository;
 import rs.raf.userservice.security.service.TokenService;
 import rs.raf.userservice.service.ClientService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Service
 @Transactional
@@ -56,6 +58,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public ClientDto add(ClientCreateDto clientCreateDto) {
         Client client = this.clientMapper.clientCreateDtoToClient(clientCreateDto);
+        client.setVerified(false);
         this.clientRepository.save(client);
 
         //pravimo token
@@ -69,12 +72,7 @@ public class ClientServiceImpl implements ClientService {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", authorization);
             //pravimo poruku
-            MessageCreateDto messageCreateDto = new MessageCreateDto();
-            messageCreateDto.setMessageType("EMAIL_ACTIVATION");
-            messageCreateDto.setUserId(client.getId());
-            messageCreateDto.setEmail(client.getEmail());
-            messageCreateDto.setTimeSent(LocalDateTime.now());
-            messageCreateDto.setFirstName(client.getFirstName());
+            MessageCreateDto messageCreateDto = new MessageCreateDto("EMAIL_ACTIVATION", client.getId(), client.getFirstName(), LocalDate.now(), LocalTime.now(), "", client.getEmail(), LocalDateTime.now(), client.getId().toString());
 
             HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
             this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);

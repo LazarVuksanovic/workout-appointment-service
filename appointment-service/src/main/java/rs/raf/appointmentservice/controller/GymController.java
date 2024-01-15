@@ -2,6 +2,7 @@ package rs.raf.appointmentservice.controller;
 
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,13 @@ public class GymController {
 
     public GymController(GymService gymService){
         this.gymService = gymService;
+    }
+
+    @ApiOperation(value = "Get all gyms")
+    @GetMapping()
+    public ResponseEntity<Page<GymDto>> findAll(@RequestHeader("Authorization") String authorization,
+                                          Pageable pageable){
+        return new ResponseEntity<>(this.gymService.findAll(pageable, authorization), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get gym")

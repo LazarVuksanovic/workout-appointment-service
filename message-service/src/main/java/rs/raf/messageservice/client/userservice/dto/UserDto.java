@@ -17,4 +17,5 @@ public class UserDto {
     private String lastName;
     private LocalDate dateOfBirth;
     private String role;
+    private Boolean verified;
 }

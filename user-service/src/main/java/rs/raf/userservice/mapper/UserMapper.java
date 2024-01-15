@@ -23,6 +23,7 @@ public class UserMapper {
         userDto.setUsername(user.getUsername());
         userDto.setDateOfBirth(user.getDateOfBirth());
         userDto.setRole(user.getRole());
+        userDto.setVerified(user.getVerified());
         return userDto;
     }
 
@@ -32,5 +33,6 @@ public class UserMapper {
         user.setFirstName(userUpdateDto.getFirstName());
         user.setLastName(userUpdateDto.getLastName());
         user.setDateOfBirth(userUpdateDto.getDateOfBirth());
+        user.setVerified(false);
     }
 }

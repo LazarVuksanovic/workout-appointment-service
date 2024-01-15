@@ -87,15 +87,7 @@ public class UserServiceImpl implements UserService {
                 HttpHeaders headers = new HttpHeaders();
                 headers.set("Authorization", authorization);
                 //pravimo poruku
-                MessageCreateDto messageCreateDto = new MessageCreateDto();
-                messageCreateDto.setMessageType("RESET_PASSWORD");
-                messageCreateDto.setUserId(user.getId());
-                messageCreateDto.setEmail(user.getEmail());
-                messageCreateDto.setTimeSent(LocalDateTime.now());
-                messageCreateDto.setFirstName(user.getFirstName());
-                messageCreateDto.setAppointmentDate(LocalDate.now());
-                messageCreateDto.setAppointmentPlace("");
-                messageCreateDto.setAppointmentTime(LocalTime.now());
+                MessageCreateDto messageCreateDto = new MessageCreateDto("RESET_PASSWORD", user.getId(), user.getFirstName(), LocalDate.now(), LocalTime.now(), "", user.getEmail(), LocalDateTime.now(), "");
 
                 HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
                 this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);
@@ -185,5 +177,12 @@ public class UserServiceImpl implements UserService {
             return user;
         });
         return users;
+    }
+
+    @Override
+    public IdDto emailVerification(String authorization, IdDto id) {
+        Optional<User> user = this.userRepository.findById(id.getId());
+        user.get().setVerified(true);
+        return id;
     }
 }

@@ -43,6 +43,13 @@ public class UserController {
         return new ResponseEntity<>(this.userService.resetPassword(authorization, resetPasswordDto), HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Verify email")
+    @PostMapping("/email-verification")
+    public ResponseEntity<IdDto> emailVerification(@RequestHeader("Authorization") String authorization,
+                                                          @RequestBody IdDto id){
+        return new ResponseEntity<>(this.userService.emailVerification(authorization, id), HttpStatus.OK);
+    }
+
     @ApiOperation(value = "Edit user")
     @PostMapping("/edit")
     public ResponseEntity<UserDto> updateClient(@RequestHeader("Authorization") String authorization,

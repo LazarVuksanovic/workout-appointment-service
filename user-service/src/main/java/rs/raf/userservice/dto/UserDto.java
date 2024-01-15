@@ -18,4 +18,5 @@ public class UserDto {
     private LocalDate dateOfBirth;
     private String role;
     private Boolean banned;
+    private Boolean verified;
 }

@@ -19,4 +19,20 @@ public class MessageCreateDto {
     private String appointmentPlace;
     private String email;
     private LocalDateTime timeSent;
+    private String link;
+
+    public MessageCreateDto(String messageType, Long userId, String firstName, LocalDate appointmentDate, LocalTime appointmentTime, String appointmentPlace, String email, LocalDateTime timeSent, String link) {
+        this.messageType = messageType;
+        this.userId = userId;
+        this.firstName = firstName;
+        this.appointmentDate = appointmentDate;
+        this.appointmentTime = appointmentTime;
+        this.appointmentPlace = appointmentPlace;
+        this.email = email;
+        this.timeSent = timeSent;
+        this.link = link;
+    }
+    public MessageCreateDto(){
+
+    }
 }

@@ -1,5 +1,7 @@
 package rs.raf.appointmentservice.service.impl;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +46,11 @@ public class GymServiceImpl implements GymService {
         this.gymMapper = gymMapper;
         this.gymTrainingTypeMapper = gymTrainingTypeMapper;
         this.userServiceRestTemplate = userServiceRestTemplate;
+    }
+
+    @Override
+    public Page<GymDto> findAll(Pageable pageable, String authorization) {
+        return this.gymRepository.findAll(pageable).map(this.gymMapper::gymToGymDto);
     }
 
     @Override

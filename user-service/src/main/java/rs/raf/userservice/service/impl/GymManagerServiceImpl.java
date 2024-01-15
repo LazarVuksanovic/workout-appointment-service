@@ -23,7 +23,9 @@ import rs.raf.userservice.repository.GymManagerRepository;
 import rs.raf.userservice.security.service.TokenService;
 import rs.raf.userservice.service.GymManagerService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Service
 @Transactional
@@ -50,6 +52,8 @@ public class GymManagerServiceImpl implements GymManagerService {
     @Override
     public GymManagerDto add(GymManagerCreateDto gymManagerCreateDto) {
         GymManager gymManager = this.gymManagerMapper.gymManagerCreateDtoToGymManager(gymManagerCreateDto);
+        gymManager.setVerified(false);
+        this.gymManagerRepository.save(gymManager);
 
         //pravimo token
         Claims claims = Jwts.claims();
@@ -62,12 +66,7 @@ public class GymManagerServiceImpl implements GymManagerService {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", authorization);
             //pravimo poruku
-            MessageCreateDto messageCreateDto = new MessageCreateDto();
-            messageCreateDto.setMessageType("EMAIL_ACTIVATION");
-            messageCreateDto.setUserId(gymManager.getId());
-            messageCreateDto.setEmail(gymManager.getEmail());
-            messageCreateDto.setTimeSent(LocalDateTime.now());
-            messageCreateDto.setFirstName(gymManager.getFirstName());
+            MessageCreateDto messageCreateDto = new MessageCreateDto("EMAIL_ACTIVATION", gymManager.getId(), gymManager.getFirstName(), LocalDate.now(), LocalTime.now(), "", gymManager.getEmail(), LocalDateTime.now(), gymManager.getId().toString());
 
             HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
             this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);
