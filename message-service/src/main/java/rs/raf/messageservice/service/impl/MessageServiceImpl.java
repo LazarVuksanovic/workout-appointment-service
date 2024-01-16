@@ -51,6 +51,8 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public MessageCreateDto addMessage(MessageCreateDto messageCreateDto) {
         Message message = this.messageMapper.mesageCreateDtoToMessage(messageCreateDto);
+        MessageType messageType = this.messageTypeRepository.findById(messageCreateDto.getMessageType()).get();
+        message.setText(messageType.mapValuesToText(messageCreateDto));
         this.messageRepository.save(message);
         return messageCreateDto;
     }

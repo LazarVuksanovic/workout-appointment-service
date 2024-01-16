@@ -17,10 +17,12 @@ public class MessageMapper {
 
     public MessageDto messageToMessageDto(Message message){
         MessageDto messageDto = new MessageDto();
+        messageDto.setId(message.getId());
         messageDto.setMessageType(message.getMessageType());
         messageDto.setUserId(message.getUserId());
         messageDto.setEmail(message.getEmail());
         messageDto.setTimeSent(message.getTimeSent());
+        messageDto.setText(message.getText());
         return messageDto;
     }
 

@@ -19,4 +19,5 @@ public class Message {
     private Long userId;
     private String email;
     private LocalDateTime timeSent;
+    private String text;
 }

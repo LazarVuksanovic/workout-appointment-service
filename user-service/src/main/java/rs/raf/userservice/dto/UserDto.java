@@ -19,4 +19,5 @@ public class UserDto {
     private String role;
     private Boolean banned;
     private Boolean verified;
+    private Integer scheduledAppointments;
 }

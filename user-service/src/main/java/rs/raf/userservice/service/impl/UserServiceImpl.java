@@ -14,6 +14,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import rs.raf.userservice.client.messageservice.dto.MessageCreateDto;
 import rs.raf.userservice.domain.BannedUser;
+import rs.raf.userservice.domain.Client;
 import rs.raf.userservice.domain.GymManager;
 import rs.raf.userservice.domain.User;
 import rs.raf.userservice.dto.*;
@@ -22,6 +23,7 @@ import rs.raf.userservice.exception.NotFoundException;
 import rs.raf.userservice.mapper.BannedUserMapper;
 import rs.raf.userservice.mapper.UserMapper;
 import rs.raf.userservice.repository.BannedUserRepository;
+import rs.raf.userservice.repository.ClientRepository;
 import rs.raf.userservice.repository.UserRepository;
 import rs.raf.userservice.security.service.TokenService;
 import rs.raf.userservice.service.UserService;
@@ -41,16 +43,18 @@ public class UserServiceImpl implements UserService {
     private BannedUserRepository bannedUserRepository;
     private BannedUserMapper bannedUserMapper;
     private RestTemplate messageServiceRestTemplate;
+    private ClientRepository clientRepository;
 
     public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, TokenService tokenService,
                            BannedUserRepository bannedUserRepository, BannedUserMapper bannedUserMapper,
-                           RestTemplate messageServiceRestTemplate){
+                           RestTemplate messageServiceRestTemplate, ClientRepository clientRepository){
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.tokenService = tokenService;
         this.bannedUserRepository = bannedUserRepository;
         this.bannedUserMapper = bannedUserMapper;
         this.messageServiceRestTemplate = messageServiceRestTemplate;
+        this.clientRepository = clientRepository;
     }
 
     @Override
@@ -172,7 +176,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<UserDto> findAll(Pageable pageable, String authorization) {
         Page<UserDto> users = this.userRepository.findAll(pageable).map(this.userMapper::userToUserDto);
+
         users.map(user -> {
+            Optional<Client> client = this.clientRepository.findById(user.getId());
+            client.ifPresent(value -> user.setScheduledAppointments(value.getScheduledTrainings()));
             user.setBanned(this.bannedUserRepository.findById(user.getId()).isPresent());
             return user;
         });
