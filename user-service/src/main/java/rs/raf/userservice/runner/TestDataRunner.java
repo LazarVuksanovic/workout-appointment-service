@@ -62,7 +62,7 @@ public class TestDataRunner implements CommandLineRunner {
         gymManager.setFirstName("Nikola");
         gymManager.setLastName("Nikolic");
         gymManager.setDateOfBirth(LocalDate.of(1999, 4, 3));
-        gymManager.setGymName("IRON REPUBLIC");
+        gymManager.setGymName("Iron Republic");
         gymManager.setEmploymentDate(LocalDate.now());
         gymManager.setVerified(true);
         this.userRepository.save(admin);

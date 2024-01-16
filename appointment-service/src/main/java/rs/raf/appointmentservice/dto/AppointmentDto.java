@@ -19,7 +19,26 @@ public class AppointmentDto {
     private Integer availablePlaces;
     private Long gymId;
     private Long trainingTypeId;
+    private Long gymTrainingTypeId;
     private String gymName;
     private String trainingTypeName;
     private BigDecimal price;
+
+    @Override
+    public String toString() {
+        return "AppointmentDto{" +
+                "id=" + id +
+                ", date=" + date +
+                ", start=" + start +
+                ", end=" + end +
+                ", maxPeople=" + maxPeople +
+                ", availablePlaces=" + availablePlaces +
+                ", gymId=" + gymId +
+                ", trainingTypeId=" + trainingTypeId +
+                ", gymTrainingTypeId=" + gymTrainingTypeId +
+                ", gymName='" + gymName + '\'' +
+                ", trainingTypeName='" + trainingTypeName + '\'' +
+                ", price=" + price +
+                '}';
+    }
 }

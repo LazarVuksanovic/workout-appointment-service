@@ -24,6 +24,7 @@ import rs.raf.userservice.mapper.BannedUserMapper;
 import rs.raf.userservice.mapper.UserMapper;
 import rs.raf.userservice.repository.BannedUserRepository;
 import rs.raf.userservice.repository.ClientRepository;
+import rs.raf.userservice.repository.GymManagerRepository;
 import rs.raf.userservice.repository.UserRepository;
 import rs.raf.userservice.security.service.TokenService;
 import rs.raf.userservice.service.UserService;
@@ -44,10 +45,12 @@ public class UserServiceImpl implements UserService {
     private BannedUserMapper bannedUserMapper;
     private RestTemplate messageServiceRestTemplate;
     private ClientRepository clientRepository;
+    private GymManagerRepository gymManagerRepository;
 
     public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, TokenService tokenService,
                            BannedUserRepository bannedUserRepository, BannedUserMapper bannedUserMapper,
-                           RestTemplate messageServiceRestTemplate, ClientRepository clientRepository){
+                           RestTemplate messageServiceRestTemplate, ClientRepository clientRepository,
+                           GymManagerRepository gymManagerRepository){
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.tokenService = tokenService;
@@ -55,6 +58,7 @@ public class UserServiceImpl implements UserService {
         this.bannedUserMapper = bannedUserMapper;
         this.messageServiceRestTemplate = messageServiceRestTemplate;
         this.clientRepository = clientRepository;
+        this.gymManagerRepository = gymManagerRepository;
     }
 
     @Override
@@ -160,6 +164,8 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new NotFoundException("greska"));
         UserDto userDto = this.userMapper.userToUserDto(user);
         userDto.setBanned(this.bannedUserRepository.findById(user.getId()).isPresent());
+        Optional<GymManager> manager = this.gymManagerRepository.findById(user.getId());
+        manager.ifPresent(gymManager -> userDto.setGymName(manager.get().getGymName()));
         return userDto;
     }
 

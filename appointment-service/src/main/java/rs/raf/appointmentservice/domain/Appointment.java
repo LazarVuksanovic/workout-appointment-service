@@ -27,22 +27,17 @@ public class Appointment {
     private Integer availablePlaces;
 
     @ManyToOne
-    @JoinColumn(name = "gym_id")
-    private Gym gym;
-
-    @ManyToOne
-    @JoinColumn(name = "training_type_id")
-    private TrainingType trainingType;
+    @JoinColumn(name = "gym_training_type_id")
+    private GymTrainingType gymTrainingType;
 
     @OneToMany(mappedBy = "id.appointmentId", cascade = CascadeType.REMOVE)
     private Set<ScheduledAppointment> scheduledAppointments;
 
-    public Appointment(LocalDate date, LocalTime start, LocalTime end, Gym gym, TrainingType trainingType, Integer maxPeople, Integer availablePlaces){
+    public Appointment(LocalDate date, LocalTime start, LocalTime end, GymTrainingType gymTrainingType, Integer maxPeople, Integer availablePlaces){
         this.date = date;
         this.start = start;
         this.end = end;
-        this.gym = gym;
-        this.trainingType = trainingType;
+        this.gymTrainingType = gymTrainingType;
         this.maxPeople = maxPeople;
         this.availablePlaces = availablePlaces;
     }
@@ -54,8 +49,7 @@ public class Appointment {
         this.end = appointment.getEnd();
         this.maxPeople = appointment.getMaxPeople();
         this.availablePlaces = appointment.getAvailablePlaces();
-        this.gym = appointment.getGym();
-        this.trainingType = appointment.getTrainingType();
+        this.gymTrainingType = appointment.getGymTrainingType();
     }
     public Appointment(){
 
@@ -70,8 +64,7 @@ public class Appointment {
                 ", end=" + end +
                 ", maxPeople=" + maxPeople +
                 ", availablePlaces=" + availablePlaces +
-                ", gym=" + gym +
-                ", trainingType=" + trainingType +
+                ", trainingType=" + gymTrainingType +
                 ", scheduledAppointments=" + scheduledAppointments +
                 '}';
     }

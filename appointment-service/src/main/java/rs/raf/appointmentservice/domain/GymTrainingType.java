@@ -34,4 +34,14 @@ public class GymTrainingType {
 
     public GymTrainingType(){
     }
+
+    @Override
+    public String toString() {
+        return "GymTrainingType{" +
+                "id=" + id +
+                ", gym=" + gym +
+                ", trainingType=" + trainingType +
+                ", price=" + price +
+                '}';
+    }
 }

@@ -31,6 +31,14 @@ public class AppointmentController {
         System.out.println(filterDto.toString());
         return new ResponseEntity<>(this.appointmentService.findAll(pageable, filterDto), HttpStatus.OK);
     }
+
+    @ApiOperation(value = "Add appointment")
+    @PostMapping("/add")
+    public ResponseEntity<AppointmentDto> add(@RequestHeader("Authorization") String authorization,
+                                                    @RequestBody AppointmentDto appointmentDto){
+        return new ResponseEntity<>(this.appointmentService.add(authorization, appointmentDto), HttpStatus.OK);
+    }
+
     @ApiOperation(value = "Schedule an appointment")
     @PostMapping("/schedule")
     public ResponseEntity<ScheduledAppointmentDto> scheduleAppointment(@RequestHeader("Authorization") String authorization,

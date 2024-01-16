@@ -98,7 +98,7 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
         if(appointment.get().getAvailablePlaces() <= 0)
             throw new AppointmentNotAvailableException("APPOINTMENT NOT AVAILABLE");
 
-        //nalazimo prvo korisnika da bi mogli da proverimo da li je korisnik vec zakazao taj termin
+        //nalazimo korisnika
         ResponseEntity<UserDto> user = null;
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -150,7 +150,7 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
             messageCreateDto.setTimeSent(LocalDateTime.now());
             messageCreateDto.setAppointmentTime(appointment.get().getStart());
             messageCreateDto.setAppointmentDate(appointment.get().getDate());
-            messageCreateDto.setAppointmentPlace(appointment.get().getGym().getName());
+            messageCreateDto.setAppointmentPlace(appointment.get().getGymTrainingType().getGym().getName());
             messageCreateDto.setFirstName(user.getBody().getFirstName());
 
             HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
@@ -177,11 +177,14 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
             if(e.getStatusCode().equals(HttpStatus.NOT_FOUND))
                 throw new NotFoundException("NEVALIDAN KORISNIK");
         }
-        //proveravamo ko je otkazao termin
+
         Optional<Appointment> appointment = this.appointmentRepository.findById(appointmentId.getId());
+
+        //proveravamo ko je otkazao termin
         if(user.getBody().getRole().equals("gymmanager"))
             return managerCancelAppointment(authorization, appointment.get(), user.getBody().getId());
 
+        //oslobadjamo jedno slobodno mesto
         appointment.get().setAvailablePlaces(appointment.get().getAvailablePlaces()+1);
 
         //nalazimo taj zakazani termin
@@ -217,7 +220,7 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
             messageCreateDto.setTimeSent(LocalDateTime.now());
             messageCreateDto.setAppointmentTime(appointment.get().getStart());
             messageCreateDto.setAppointmentDate(appointment.get().getDate());
-            messageCreateDto.setAppointmentPlace(appointment.get().getGym().getName());
+            messageCreateDto.setAppointmentPlace(appointment.get().getGymTrainingType().getGym().getName());
             messageCreateDto.setFirstName(user.getBody().getFirstName());
 
             HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
@@ -233,6 +236,7 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
     }
 
     private ScheduledAppointmentDto managerCancelAppointment(String authorization, Appointment appointment, Long managerId){
+        //stavljamo termin nedostupnim
         appointment.setAvailablePlaces(0);
         this.appointmentRepository.save(appointment);
 
@@ -255,7 +259,7 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
             messageCreateDto.setTimeSent(LocalDateTime.now());
             messageCreateDto.setAppointmentTime(appointment.getStart());
             messageCreateDto.setAppointmentDate(appointment.getDate());
-            messageCreateDto.setAppointmentPlace(appointment.getGym().getName());
+            messageCreateDto.setAppointmentPlace(appointment.getGymTrainingType().getGym().getName());
             messageCreateDto.setFirstName(user.getBody().getFirstName());
 
             HttpEntity<MessageCreateDto> request2 = new HttpEntity<>(messageCreateDto, headers);
@@ -271,20 +275,4 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
         scheduledAppointmentDto.setUserId(managerId);
         return scheduledAppointmentDto;
     }
-
-//    private boolean filterByTrainingType(Appointment appointment, List<Long> trainingTypeId) {
-//        return trainingTypeId == null || trainingTypeId.contains(appointment.getTrainingType().getId());
-//    }
-//
-//    // Filtriranje po isIndividual
-//    private boolean filterByIsIndividual(Appointment appointment, Integer isIndividual) {
-//        if (isIndividual == null)
-//            return true;
-//        return (isIndividual == 1) == (appointment.getMaxPeople() == 1);
-//    }
-//
-//    // Filtriranje po danu u nedelji
-//    private boolean filterByDayOfWeek(Appointment appointment, DayOfWeek dayOfWeek) {
-//        return dayOfWeek == null || appointment.getDate().getDayOfWeek().equals(dayOfWeek);
-//    }
 }

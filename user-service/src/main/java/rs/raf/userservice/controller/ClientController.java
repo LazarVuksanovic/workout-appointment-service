@@ -44,7 +44,7 @@ public class ClientController {
 
     @ApiOperation(value = "User cancel appointment")
     @PostMapping("/cancel-appointment")
-    @CheckSecurity(roles = {"admin", "client", "gymmanager"})
+    @CheckSecurity(roles = {"admin", "client"})
     public ResponseEntity<IdDto> cancelAppointment(@RequestHeader("Authorization") String authorization){
         return new ResponseEntity<>(this.clientService.cancelAppointment(authorization), HttpStatus.OK);
     }

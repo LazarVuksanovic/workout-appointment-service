@@ -9,5 +9,5 @@ import rs.raf.appointmentservice.dto.FilterDto;
 public interface AppointmentService {
 
     Page<AppointmentDto> findAll(Pageable pageable, FilterDto filterDto);
-
+    AppointmentDto add(String authorization, AppointmentDto appointmentDto);
 }

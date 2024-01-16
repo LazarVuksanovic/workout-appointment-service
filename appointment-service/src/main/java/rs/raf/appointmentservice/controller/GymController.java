@@ -28,9 +28,16 @@ public class GymController {
 
     @ApiOperation(value = "Get gym")
     @GetMapping("/{id}")
-    public ResponseEntity<GymDto> updateGym(@RequestHeader("Authorization") String authorization,
+    public ResponseEntity<GymDto> getGym(@RequestHeader("Authorization") String authorization,
                                             @PathVariable Long id){
         return new ResponseEntity<>(this.gymService.getGym(authorization, id), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Get gym by name")
+    @PostMapping("/name")
+    public ResponseEntity<GymDto> getGymByName(@RequestHeader("Authorization") String authorization,
+                                            @RequestBody NameDto name){
+        return new ResponseEntity<>(this.gymService.getGymByName(authorization, name), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Edit gym")
@@ -44,13 +51,20 @@ public class GymController {
     @PostMapping("/{gymId}/add-training-type")
     public ResponseEntity<GymTrainingTypeDto> addTrainingTypeToGym(@RequestHeader("Authorization") String authorization,
                                                                 @PathVariable Long gymId, @RequestBody NewGymTrainingTypeDto newGymTrainingTypeDto){
-        return new ResponseEntity<>(this.gymService.addTrainingType("Bearer " + authorization, gymId, newGymTrainingTypeDto), HttpStatus.OK);
+        return new ResponseEntity<>(this.gymService.addTrainingType(authorization, gymId, newGymTrainingTypeDto), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Remove training type from a gym")
-    @PostMapping("/{gymId}/remove-training-type/{trainingTypeId}")
+    @PostMapping("/remove-training-type/{id}")
     public ResponseEntity<GymTrainingTypeDto> removeTrainingTypeToGym(@RequestHeader("Authorization") String authorization,
-                                                                      @PathVariable Long gymId, @PathVariable Long trainingTypeId){
-        return new ResponseEntity<>(this.gymService.removeTrainingType("Bearer " + authorization, gymId, trainingTypeId), HttpStatus.OK);
+                                                                      @PathVariable Long id){
+        return new ResponseEntity<>(this.gymService.removeTrainingType(authorization, id), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "All training type from a gym")
+    @GetMapping("/{gymId}/training-types")
+    public ResponseEntity<Page<GymTrainingTypeDto>> findAllTrainingTypes(@RequestHeader("Authorization") String authorization,
+                                                                      @PathVariable Integer gymId, Pageable pageable){
+        return new ResponseEntity<>(this.gymService.findAllTrainingTypes(pageable, authorization, gymId.longValue()), HttpStatus.OK);
     }
 }

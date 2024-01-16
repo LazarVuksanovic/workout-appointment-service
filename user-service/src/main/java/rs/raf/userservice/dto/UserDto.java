@@ -20,4 +20,5 @@ public class UserDto {
     private Boolean banned;
     private Boolean verified;
     private Integer scheduledAppointments;
+    private String gymName;
 }
