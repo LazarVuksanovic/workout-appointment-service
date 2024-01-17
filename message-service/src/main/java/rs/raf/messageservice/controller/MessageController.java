@@ -49,7 +49,14 @@ public class MessageController {
     @GetMapping("/type")
     public ResponseEntity<Page<MessageTypeDto>> findAllMessageTypes(@RequestHeader("Authorization") String authorization,
                                                                     Pageable pageable){
-        return new ResponseEntity<>(this.messageService.findAllMessageTypes("Bearer " + authorization, pageable), HttpStatus.OK);
+        return new ResponseEntity<>(this.messageService.findAllMessageTypes(authorization, pageable), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Get message type")
+    @GetMapping("/type/{messageType}")
+    public ResponseEntity<MessageTypeDto> findMessageType(@RequestHeader("Authorization") String authorization,
+                                                                    @PathVariable String messageType){
+        return new ResponseEntity<>(this.messageService.findMessageType(authorization, messageType), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Edit message type")
@@ -57,20 +64,20 @@ public class MessageController {
     public ResponseEntity<MessageTypeDto> updateMessageType(@RequestHeader("Authorization") String authorization,
                                                             @PathVariable String messageType,
                                                             @RequestBody MessageTypeUpdateDto messageTypeUpdateDto){
-        return new ResponseEntity<>(this.messageService.updateMessageType("Bearer " + authorization, messageType, messageTypeUpdateDto), HttpStatus.OK);
+        return new ResponseEntity<>(this.messageService.updateMessageType(authorization, messageType, messageTypeUpdateDto), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Delete message type")
     @PostMapping("/type/{messageType}/delete")
     public ResponseEntity<MessageTypeDto> deleteMessageType(@RequestHeader("Authorization") String authorization,
                                                             @PathVariable String messageType){
-        return new ResponseEntity<>(this.messageService.deleteMessageType("Bearer " + authorization, messageType), HttpStatus.OK);
+        return new ResponseEntity<>(this.messageService.deleteMessageType(authorization, messageType), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Add message type")
     @PostMapping("/type")
     public ResponseEntity<MessageTypeDto> addMessageType(@RequestHeader("Authorization") String authorization,
                                                             @RequestBody MessageTypeDto messageTypeDto){
-        return new ResponseEntity<>(this.messageService.addMessageType("Bearer " + authorization, messageTypeDto), HttpStatus.OK);
+        return new ResponseEntity<>(this.messageService.addMessageType(authorization, messageTypeDto), HttpStatus.OK);
     }
 }

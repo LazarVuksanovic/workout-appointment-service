@@ -29,6 +29,9 @@ public class AppointmentMapper {
         appointmentDto.setAvailablePlaces(appointment.getAvailablePlaces());
         appointmentDto.setGymId(appointment.getGymTrainingType().getGym().getId());
         appointmentDto.setTrainingTypeId(appointment.getGymTrainingType().getTrainingType().getId());
+        appointmentDto.setGymName(appointment.getGymTrainingType().getGym().getName());
+        appointmentDto.setPrice(appointment.getGymTrainingType().getPrice());
+        appointmentDto.setTrainingTypeName(appointment.getGymTrainingType().getTrainingType().getName());
         return appointmentDto;
     }
 

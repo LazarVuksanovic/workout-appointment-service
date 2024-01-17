@@ -29,6 +29,7 @@ import rs.raf.userservice.repository.UserRepository;
 import rs.raf.userservice.security.service.TokenService;
 import rs.raf.userservice.service.UserService;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -193,9 +194,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public IdDto emailVerification(String authorization, IdDto id) {
-        Optional<User> user = this.userRepository.findById(id.getId());
-        user.get().setVerified(true);
-        return id;
+    public UserDto emailVerification(String authorization, String verificationToken) {
+        Claims claims = this.tokenService.parseToken(verificationToken);
+        User user = this.userRepository
+                .findById(claims.get("id", Integer.class).longValue())
+                .orElseThrow(() -> new NotFoundException("greska"));
+        user.setVerified(true);
+        return this.userMapper.userToUserDto(user);
     }
 }

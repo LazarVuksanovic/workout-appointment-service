@@ -67,12 +67,18 @@ public class ClientServiceImpl implements ClientService {
         claims.put("role", client.getRole());
         String authorization = this.tokenService.generate(claims);
 
+        //pravimo token za verifikaciju mejla
+        Claims claimsMail = Jwts.claims();
+        claimsMail.put("id", client.getId());
+        claimsMail.put("date", LocalDateTime.now());
+        String mailCode = this.tokenService.generate(claimsMail);
+
         //pravim poruku za aktivaciju mejla i saljemo
         try{
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", authorization);
             //pravimo poruku
-            MessageCreateDto messageCreateDto = new MessageCreateDto("EMAIL_ACTIVATION", client.getId(), client.getFirstName(), LocalDate.now(), LocalTime.now(), "", client.getEmail(), LocalDateTime.now(), client.getId().toString());
+            MessageCreateDto messageCreateDto = new MessageCreateDto("EMAIL_ACTIVATION", client.getId(), client.getFirstName(), LocalDate.now(), LocalTime.now(), "", client.getEmail(), LocalDateTime.now(), mailCode);
 
             HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
             this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);

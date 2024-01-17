@@ -16,6 +16,7 @@ import rs.raf.userservice.client.messageservice.dto.MessageCreateDto;
 import rs.raf.userservice.domain.GymManager;
 import rs.raf.userservice.dto.GymManagerCreateDto;
 import rs.raf.userservice.dto.GymManagerDto;
+import rs.raf.userservice.dto.GymNameDto;
 import rs.raf.userservice.dto.IdDto;
 import rs.raf.userservice.exception.NotFoundException;
 import rs.raf.userservice.mapper.GymManagerMapper;
@@ -61,12 +62,18 @@ public class GymManagerServiceImpl implements GymManagerService {
         claims.put("role", gymManager.getRole());
         String authorization = this.tokenService.generate(claims);
 
+        //pravimo token za verifikaciju mejla
+        Claims claimsMail = Jwts.claims();
+        claimsMail.put("id", gymManager.getId());
+        claimsMail.put("date", LocalDateTime.now());
+        String mailCode = this.tokenService.generate(claimsMail);
+
         //pravim poruku za aktivaciju mejla i saljemo
         try{
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", authorization);
             //pravimo poruku
-            MessageCreateDto messageCreateDto = new MessageCreateDto("EMAIL_ACTIVATION", gymManager.getId(), gymManager.getFirstName(), LocalDate.now(), LocalTime.now(), "", gymManager.getEmail(), LocalDateTime.now(), gymManager.getId().toString());
+            MessageCreateDto messageCreateDto = new MessageCreateDto("EMAIL_ACTIVATION", gymManager.getId(), gymManager.getFirstName(), LocalDate.now(), LocalTime.now(), "", gymManager.getEmail(), LocalDateTime.now(), mailCode);
 
             HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
             this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);
@@ -89,5 +96,16 @@ public class GymManagerServiceImpl implements GymManagerService {
         IdDto idDto = new IdDto();
         idDto.setId(gymManager.getId());
         return idDto;
+    }
+
+    @Override
+    public GymManagerDto changeGymName(String authorization, GymNameDto gymNameDto) {
+        //ovo sam stelovao zbog Bearer
+        Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")).trim());
+        GymManager gymManager = this.gymManagerRepository
+                .findById(claims.get("id", Integer.class).longValue())
+                .orElseThrow(() -> new NotFoundException("greska"));
+        gymManager.setGymName(gymNameDto.getGymName());
+        return this.gymManagerMapper.gymManagerToGymManagerDto(gymManager);
     }
 }

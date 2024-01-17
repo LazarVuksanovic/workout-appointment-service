@@ -10,4 +10,5 @@ public interface AppointmentService {
 
     Page<AppointmentDto> findAll(Pageable pageable, FilterDto filterDto);
     AppointmentDto add(String authorization, AppointmentDto appointmentDto);
+    Page<AppointmentDto> findAllGymAppointments(Pageable pageable, String authorization, Long id);
 }

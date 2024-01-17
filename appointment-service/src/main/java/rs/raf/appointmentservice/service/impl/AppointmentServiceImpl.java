@@ -93,6 +93,27 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointmentDto;
     }
 
+    @Override
+    public Page<AppointmentDto> findAllGymAppointments(Pageable pageable, String authorization, Long id) {
+        ResponseEntity<UserDto> user = null;
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", authorization);
+
+            HttpEntity<String> request = new HttpEntity<>(headers);
+            user = this.userServiceRestTemplate.exchange("/user/id", HttpMethod.GET, request, UserDto.class);
+        }catch (HttpClientErrorException e){
+            if(e.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                throw new NotFoundException("NEVALIDAN KORISNIK");
+        }
+
+        if(!user.getBody().getRole().equals("gymmanager"))
+            throw new NotFoundException("NISI GYM MANAGER");
+
+        Page<Appointment> appointments = this.appointmentRepository.findAllByGymId(pageable, id).get();
+        return appointments.map(this.appointmentMapper::appointmentToAppointmentDto);
+    }
+
     // Filtriranje po trainingTypeId
     private boolean filterByTrainingType(Appointment appointment, String trainingTypes) {
         return trainingTypes == null || trainingTypes.contains(appointment.getGymTrainingType().getTrainingType().getName());

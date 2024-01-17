@@ -14,5 +14,5 @@ public interface UserService {
     UserDto userId(String authorization);
     UserDto onlyAdmin(String authorization);
     Page<UserDto> findAll(Pageable pageable, String authorization);
-    IdDto emailVerification(String authorization, IdDto id);
+    UserDto emailVerification(String authorization, String verificationToken);
 }

@@ -12,4 +12,5 @@ public interface ScheduledAppointmentService {
     Page<AppointmentDto> findUserAppointments(Pageable pageable, String authorization, FilterDto filterDto);
     ScheduledAppointmentDto scheduleAppointment(String authorization, IdDto appointmentId);
     ScheduledAppointmentDto cancelAppointment(String authorization, IdDto appointmentId);
+    AppointmentDto makeAvailableAgain(String authorization, Long id);
 }

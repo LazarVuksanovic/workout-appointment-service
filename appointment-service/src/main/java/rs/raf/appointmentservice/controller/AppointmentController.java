@@ -28,7 +28,6 @@ public class AppointmentController {
     @ApiOperation(value = "Find all appointments")
     @PostMapping()
     public ResponseEntity<Page<AppointmentDto>> findAll(Pageable pageable, @RequestBody FilterDto filterDto){
-        System.out.println(filterDto.toString());
         return new ResponseEntity<>(this.appointmentService.findAll(pageable, filterDto), HttpStatus.OK);
     }
 
@@ -53,11 +52,26 @@ public class AppointmentController {
         return new ResponseEntity<>(this.scheduledAppointmentService.cancelAppointment(authorization, idDto), HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Make appointment available again")
+    @PostMapping("/make-available/{id}")
+    public ResponseEntity<AppointmentDto> makeAvailableAgain(@RequestHeader("Authorization") String authorization,
+                                                             @PathVariable Long id){
+        return new ResponseEntity<>(this.scheduledAppointmentService.makeAvailableAgain(authorization, id), HttpStatus.OK);
+    }
+
     @ApiOperation(value = "Find user appointments")
     @GetMapping("/user-appointments")
     public ResponseEntity<Page<AppointmentDto>> findUserAppointments(Pageable pageable,
                                                                      @RequestHeader("Authorization") String authorization){
         //FilterDto filterDto
         return new ResponseEntity<>(this.scheduledAppointmentService.findUserAppointments(pageable, authorization, null), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Find all gym appointments")
+    @GetMapping("/gym-appointments/{id}")
+    public ResponseEntity<Page<AppointmentDto>> findAllGymAppointments(Pageable pageable,
+                                                                       @RequestHeader("Authorization") String authorization,
+                                                                       @PathVariable Long id){
+        return new ResponseEntity<>(this.appointmentService.findAllGymAppointments(pageable, authorization, id), HttpStatus.OK);
     }
 }

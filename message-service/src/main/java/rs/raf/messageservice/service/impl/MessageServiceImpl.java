@@ -52,25 +52,13 @@ public class MessageServiceImpl implements MessageService {
     public MessageCreateDto addMessage(MessageCreateDto messageCreateDto) {
         Message message = this.messageMapper.mesageCreateDtoToMessage(messageCreateDto);
         MessageType messageType = this.messageTypeRepository.findById(messageCreateDto.getMessageType()).get();
-        message.setText(messageType.mapValuesToText(messageCreateDto));
+        message.setText(messageType.mapValuesToTextWithoutLink(messageCreateDto));
         this.messageRepository.save(message);
         return messageCreateDto;
     }
 
     @Override
     public Page<MessageTypeDto> findAllMessageTypes(String authorization, Pageable pageable) {
-        //provaravamo da li je admin
-        try{
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", authorization);
-
-            HttpEntity<String> request = new HttpEntity<>(headers);
-            this.userServiceRestTemplate.exchange("/user/only-admin", HttpMethod.GET, request, UserDto.class);
-        }catch (HttpClientErrorException e) {
-            if (!e.getStatusCode().equals(HttpStatus.OK))
-                throw new NotFoundException("NEVALIDAN KORISNIK");
-        }
-
         return this.messageTypeRepository.findAll(pageable).map(messageTypeMapper::messageTypeToMessageTypeDto);
     }
 
@@ -95,38 +83,32 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public MessageTypeDto deleteMessageType(String authorization, String messageType) {
-        //provaravamo da li je admin
-        try{
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", authorization);
-
-            HttpEntity<String> request = new HttpEntity<>(headers);
-            this.userServiceRestTemplate.exchange("/user/only-admin", HttpMethod.GET, request, UserDto.class);
-        }catch (HttpClientErrorException e) {
-            if (!e.getStatusCode().equals(HttpStatus.OK))
-                throw new NotFoundException("NEVALIDAN KORISNIK");
-        }
-
         Optional<MessageType> messageType1 = this.messageTypeRepository.findById(messageType);
+        this.messageRepository.updateGymTrainingTypeToNull(messageType);
         this.messageTypeRepository.delete(messageType1.get());
         return this.messageTypeMapper.messageTypeToMessageTypeDto(messageType1.get());
     }
 
     @Override
     public MessageTypeDto addMessageType(String authorization, MessageTypeDto messageTypeDto) {
-        //provaravamo da li je admin
-        try{
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", authorization);
-
-            HttpEntity<String> request = new HttpEntity<>(headers);
-            this.userServiceRestTemplate.exchange("/user/only-admin", HttpMethod.GET, request, UserDto.class);
-        }catch (HttpClientErrorException e) {
-            if (!e.getStatusCode().equals(HttpStatus.OK))
-                throw new NotFoundException("NEVALIDAN KORISNIK");
-        }
+//        //provaravamo da li je admin
+//        try{
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.set("Authorization", authorization);
+//
+//            HttpEntity<String> request = new HttpEntity<>(headers);
+//            this.userServiceRestTemplate.exchange("/user/only-admin", HttpMethod.GET, request, UserDto.class);
+//        }catch (HttpClientErrorException e) {
+//            if (!e.getStatusCode().equals(HttpStatus.OK))
+//                throw new NotFoundException("NEVALIDAN KORISNIK");
+//        }
 
         this.messageTypeRepository.save(this.messageTypeMapper.messageTypeDtoToMessageType(messageTypeDto));
         return messageTypeDto;
+    }
+
+    @Override
+    public MessageTypeDto findMessageType(String authorization, String id) {
+        return this.messageTypeMapper.messageTypeToMessageTypeDto(this.messageTypeRepository.findById(id).get());
     }
 }

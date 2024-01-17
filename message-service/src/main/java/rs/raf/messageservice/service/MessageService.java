@@ -15,4 +15,5 @@ public interface MessageService {
     MessageTypeDto updateMessageType(String authorization, String messageType, MessageTypeUpdateDto messageTypeUpdateDto);
     MessageTypeDto deleteMessageType(String authorization, String messageType);
     MessageTypeDto addMessageType(String authorization, MessageTypeDto messageType);
+    MessageTypeDto findMessageType(String authorization, String id);
 }

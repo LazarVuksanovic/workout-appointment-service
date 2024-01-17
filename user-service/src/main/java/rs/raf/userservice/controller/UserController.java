@@ -44,10 +44,10 @@ public class UserController {
     }
 
     @ApiOperation(value = "Verify email")
-    @PostMapping("/email-verification")
-    public ResponseEntity<IdDto> emailVerification(@RequestHeader("Authorization") String authorization,
-                                                          @RequestBody IdDto id){
-        return new ResponseEntity<>(this.userService.emailVerification(authorization, id), HttpStatus.OK);
+    @PostMapping("/email-verification/{verificationToken}")
+    public ResponseEntity<UserDto> emailVerification(@RequestHeader("Authorization") String authorization,
+                                                   @PathVariable String verificationToken){
+        return new ResponseEntity<>(this.userService.emailVerification(authorization, verificationToken), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Edit user")

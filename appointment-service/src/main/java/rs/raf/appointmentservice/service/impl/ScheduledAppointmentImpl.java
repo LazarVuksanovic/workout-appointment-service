@@ -222,6 +222,7 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
             messageCreateDto.setAppointmentDate(appointment.get().getDate());
             messageCreateDto.setAppointmentPlace(appointment.get().getGymTrainingType().getGym().getName());
             messageCreateDto.setFirstName(user.getBody().getFirstName());
+            messageCreateDto.setLink("");
 
             HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
             this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);
@@ -235,14 +236,21 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
         return this.scheduledAppointmentMapper.scheduledAppointmentToScheduledAppointmentDto(scheduledAppointment.get());
     }
 
+    @Override
+    public AppointmentDto makeAvailableAgain(String authorization, Long id) {
+        Appointment appointment = this.appointmentRepository.findById(id).get();
+        appointment.setAvailablePlaces(appointment.getMaxPeople());
+        return this.appointmentMapper.appointmentToAppointmentDto(appointment);
+    }
+
     private ScheduledAppointmentDto managerCancelAppointment(String authorization, Appointment appointment, Long managerId){
         //stavljamo termin nedostupnim
-        appointment.setAvailablePlaces(0);
+        appointment.setAvailablePlaces(-1);
         this.appointmentRepository.save(appointment);
 
         //svim korisnicima smanjujemo broj zakazanih treninga i brisemo taj scheduledAppointment
         List<ScheduledAppointment> scheduledAppointments =  this.scheduledAppointmentRepository.findAllByAppointmentId(appointment.getId());
-        scheduledAppointments.stream().forEach(scheduledAppointment -> {
+        scheduledAppointments.forEach(scheduledAppointment -> {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", authorization);
             // HTTP zahtev za smanjivanje broja zakazanih treninga korisnika
@@ -261,6 +269,7 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
             messageCreateDto.setAppointmentDate(appointment.getDate());
             messageCreateDto.setAppointmentPlace(appointment.getGymTrainingType().getGym().getName());
             messageCreateDto.setFirstName(user.getBody().getFirstName());
+            messageCreateDto.setLink("");
 
             HttpEntity<MessageCreateDto> request2 = new HttpEntity<>(messageCreateDto, headers);
             this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request2, MessageCreateDto.class);
