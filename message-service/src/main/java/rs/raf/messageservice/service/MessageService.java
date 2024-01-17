@@ -16,4 +16,5 @@ public interface MessageService {
     MessageTypeDto deleteMessageType(String authorization, String messageType);
     MessageTypeDto addMessageType(String authorization, MessageTypeDto messageType);
     MessageTypeDto findMessageType(String authorization, String id);
+    Page<MessageDto> findAllUserMessages(Pageable pageable, Long id);
 }

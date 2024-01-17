@@ -38,6 +38,12 @@ public class MessageController {
         return new ResponseEntity<>(this.messageService.findAll(pageable), HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Find all messages")
+    @GetMapping("/user/{id}")
+    public ResponseEntity<Page<MessageDto>> findAllUserMessages(Pageable pageable,@PathVariable Long id){
+        return new ResponseEntity<>(this.messageService.findAllUserMessages(pageable, id), HttpStatus.OK);
+    }
+
     @ApiOperation(value = "Send messages")
     @PostMapping
     public ResponseEntity<MessageCreateDto> sendMessage(@RequestBody MessageCreateDto messageCreateDto){

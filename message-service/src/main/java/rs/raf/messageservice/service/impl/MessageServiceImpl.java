@@ -111,4 +111,10 @@ public class MessageServiceImpl implements MessageService {
     public MessageTypeDto findMessageType(String authorization, String id) {
         return this.messageTypeMapper.messageTypeToMessageTypeDto(this.messageTypeRepository.findById(id).get());
     }
+
+    @Override
+    public Page<MessageDto> findAllUserMessages(Pageable pageable, Long id) {
+        Page<Message> messages =  this.messageRepository.findByUserId(pageable, id).get();
+        return messages.map(this.messageMapper::messageToMessageDto);
+    }
 }
