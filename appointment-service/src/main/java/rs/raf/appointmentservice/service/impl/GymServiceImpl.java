@@ -60,11 +60,33 @@ public class GymServiceImpl implements GymService {
 
     @Override
     public GymDto getGym(String authorization, Long id) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", authorization);
+
+            HttpEntity<String> request = new HttpEntity<>(headers);
+            this.userServiceRestTemplate.exchange("/user/gymmanager/check-role", HttpMethod.GET, request, IdDto.class);
+        }catch (HttpClientErrorException e){
+            if(e.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                throw new NotFoundException("NEVALIDAN KORISNIK");
+        }
+
         return this.gymMapper.gymToGymDto(this.gymRepository.findById(id).get());
     }
 
     @Override
     public GymDto getGymByName(String authorization, NameDto name) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", authorization);
+
+            HttpEntity<String> request = new HttpEntity<>(headers);
+            this.userServiceRestTemplate.exchange("/user/gymmanager/check-role", HttpMethod.GET, request, IdDto.class);
+        }catch (HttpClientErrorException e){
+            if(e.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                throw new NotFoundException("NEVALIDAN KORISNIK");
+        }
+
         return this.gymMapper.gymToGymDto(this.gymRepository.findByName(name.getGymName()).get());
     }
 

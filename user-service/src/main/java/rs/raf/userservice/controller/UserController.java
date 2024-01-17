@@ -38,6 +38,7 @@ public class UserController {
 
     @ApiOperation(value = "Reset password")
     @PostMapping("/reset-password")
+    @CheckSecurity(roles = {"admin", "client", "gymmanager"})
     public ResponseEntity<TokenResponseDto> resetPassword(@RequestHeader("Authorization") String authorization,
                                                           @RequestBody ResetPasswordDto resetPasswordDto){
         return new ResponseEntity<>(this.userService.resetPassword(authorization, resetPasswordDto), HttpStatus.OK);
@@ -45,6 +46,7 @@ public class UserController {
 
     @ApiOperation(value = "Verify email")
     @PostMapping("/email-verification/{verificationToken}")
+    @CheckSecurity(roles = {"admin", "client", "gymmanager"})
     public ResponseEntity<UserDto> emailVerification(@RequestHeader("Authorization") String authorization,
                                                    @PathVariable String verificationToken){
         return new ResponseEntity<>(this.userService.emailVerification(authorization, verificationToken), HttpStatus.OK);
