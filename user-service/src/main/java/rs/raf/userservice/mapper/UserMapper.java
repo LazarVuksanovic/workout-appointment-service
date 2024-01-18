@@ -33,6 +33,6 @@ public class UserMapper {
         user.setFirstName(userUpdateDto.getFirstName());
         user.setLastName(userUpdateDto.getLastName());
         user.setDateOfBirth(userUpdateDto.getDateOfBirth());
-        user.setVerified(false);
+        user.setVerified(user.getVerified());
     }
 }

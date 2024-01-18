@@ -118,13 +118,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new NotFoundException("greska"));
 
         this.userMapper.UserUpdateDtoToUser(user, userUpdateDto);
-
-        if(user instanceof GymManager){
-           GymManager gm = (GymManager) user;
-           gm.setGymName(userUpdateDto.getGymName());
-           gm.setEmploymentDate(userUpdateDto.getEmploymentDate());
-        }
-
         this.userRepository.save(user);
         return this.userMapper.userToUserDto(user);
     }

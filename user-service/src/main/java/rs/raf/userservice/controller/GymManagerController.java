@@ -48,4 +48,11 @@ public class GymManagerController {
                                                        @RequestBody GymNameDto gymNameDto){
         return new ResponseEntity<>(this.gymManagerService.changeGymName(authorization, gymNameDto), HttpStatus.OK);
     }
+
+    @ApiOperation(value = "Get gym manager by gym name")
+    @GetMapping("/get-by-gym-name/{gymName}")
+    public ResponseEntity<GymManagerDto> getByGymName(@RequestHeader("Authorization") String authorization,
+                                                       @PathVariable String gymName){
+        return new ResponseEntity<>(this.gymManagerService.getByGymName(authorization, gymName), HttpStatus.OK);
+    }
 }

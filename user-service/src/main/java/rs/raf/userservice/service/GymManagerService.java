@@ -13,4 +13,5 @@ public interface GymManagerService {
     GymManagerDto add(GymManagerCreateDto gymManagerCreateDto);
     IdDto checkIfGymManager(String authorization);
     GymManagerDto changeGymName(String authorization, GymNameDto gymNameDto);
+    GymManagerDto getByGymName(String authorization, String gymName);
 }

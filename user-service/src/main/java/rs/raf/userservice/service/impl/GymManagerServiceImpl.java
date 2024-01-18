@@ -108,4 +108,9 @@ public class GymManagerServiceImpl implements GymManagerService {
         gymManager.setGymName(gymNameDto.getGymName());
         return this.gymManagerMapper.gymManagerToGymManagerDto(gymManager);
     }
+
+    @Override
+    public GymManagerDto getByGymName(String authorization, String gymName) {
+        return this.gymManagerMapper.gymManagerToGymManagerDto(this.gymManagerRepository.findByGymName(gymName).get());
+    }
 }

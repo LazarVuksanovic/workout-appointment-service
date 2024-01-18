@@ -14,7 +14,4 @@ public class UserUpdateDto {
     private String firstName;
     private String lastName;
     private LocalDate dateOfBirth;
-
-    private String gymName;
-    private LocalDate employmentDate;
 }

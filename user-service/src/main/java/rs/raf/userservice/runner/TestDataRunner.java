@@ -52,7 +52,7 @@ public class TestDataRunner implements CommandLineRunner {
         client2.setDateOfBirth(LocalDate.of(2003, 9, 23));
         client2.setScheduledTrainings(0);
         client2.setMembershipCardNumber("LV23090314");
-        client2.setVerified(false);
+        client2.setVerified(true);
         //Unosimo menadzera
         GymManager gymManager = new GymManager();
         gymManager.setEmail("lvuksanovic1021rn@raf.rs");

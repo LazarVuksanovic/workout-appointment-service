@@ -9,6 +9,8 @@ import java.time.LocalDate;
 @Setter
 public class GymManagerDto extends UserDto {
 
+    private Long id;
     private String gymName;
     private LocalDate employmentDate;
+    private String email;
 }

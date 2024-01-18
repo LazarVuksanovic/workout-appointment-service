@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import rs.raf.appointmentservice.client.messageservice.dto.MessageCreateDto;
+import rs.raf.appointmentservice.client.userservice.dto.GymManagerDto;
 import rs.raf.appointmentservice.client.userservice.dto.IdDto;
 import rs.raf.appointmentservice.client.userservice.dto.UserDto;
 import rs.raf.appointmentservice.domain.Appointment;
@@ -112,8 +113,7 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
         }
 
         //proveravamo da li je korisnik vec zakazao ovaj termin
-        Optional<ScheduledAppointment> s =
-                this.scheduledAppointmentRepository.findById(new ScheduledAppointmentId(user.getBody().getId(), appointmentId.getId()));
+        Optional<ScheduledAppointment> s = this.scheduledAppointmentRepository.findById(new ScheduledAppointmentId(user.getBody().getId(), appointmentId.getId()));
         if(s.isPresent())
             throw new AlreadyScheduledException("KORISNIK JE VEC ZAKAZAO OVAJ TERMIN");
 
@@ -138,20 +138,39 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
         this.scheduledAppointmentRepository.save(this.scheduledAppointmentMapper
                 .scheduledAppointmentDtoToScheduledAppointment(scheduledAppointmentDto));
 
-        //pravim poruku i saljemo
+        //dohvatamo menadzera teretane da bi mu poslali poruku
+        GymManagerDto gymManagerDto = new GymManagerDto();
+        try{
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", authorization);
+
+            HttpEntity<String> request = new HttpEntity<>(headers);
+            gymManagerDto = this.userServiceRestTemplate.exchange("/user/gymmanager/get-by-gym-name/"+appointment.get().getGymTrainingType().getGym().getName(), HttpMethod.GET, request, GymManagerDto.class).getBody();
+        }catch (HttpClientErrorException e) {
+            if (e.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                throw new NotFoundException("NEVALIDAN KORISNIK");
+        }
+
+        //pravim poruku i saljemo menadzeru
         try{
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", authorization);
             //pravimo poruku
-            MessageCreateDto messageCreateDto = new MessageCreateDto();
-            messageCreateDto.setMessageType("SUCCESSFULLY_SCHEDULED");
-            messageCreateDto.setUserId(user.getBody().getId());
-            messageCreateDto.setEmail(user.getBody().getEmail());
-            messageCreateDto.setTimeSent(LocalDateTime.now());
-            messageCreateDto.setAppointmentTime(appointment.get().getStart());
-            messageCreateDto.setAppointmentDate(appointment.get().getDate());
-            messageCreateDto.setAppointmentPlace(appointment.get().getGymTrainingType().getGym().getName());
-            messageCreateDto.setFirstName(user.getBody().getFirstName());
+            MessageCreateDto messageCreateDto = new MessageCreateDto("SUCCESSFULLY_SCHEDULED", gymManagerDto.getId(), user.getBody().getFirstName(), appointment.get().getDate(), appointment.get().getStart(), appointment.get().getGymTrainingType().getGym().getName(), gymManagerDto.getEmail(), LocalDateTime.now(), "");
+
+            HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
+            this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);
+        }catch (HttpClientErrorException e) {
+            if (e.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                throw new NotFoundException("NEVALIDAN KORISNIK");
+        }
+
+        //pravim poruku i saljemo korisniku
+        try{
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", authorization);
+            //pravimo poruku
+            MessageCreateDto messageCreateDto = new MessageCreateDto("SUCCESSFULLY_SCHEDULED", user.getBody().getId(), user.getBody().getFirstName(), appointment.get().getDate(), appointment.get().getStart(), appointment.get().getGymTrainingType().getGym().getName(), user.getBody().getEmail(), LocalDateTime.now(), "");
 
             HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
             this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);
@@ -208,21 +227,39 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
                 throw new NotFoundException("NEVALIDAN KORISNIK");
         }
 
-        //pravim poruku i saljemo
+        //dohvatamo menadzera teretane da bi mu poslali poruku
+        GymManagerDto gymManagerDto = new GymManagerDto();
+        try{
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", authorization);
+
+            HttpEntity<String> request = new HttpEntity<>(headers);
+            gymManagerDto = this.userServiceRestTemplate.exchange("/user/gymmanager/get-by-gym-name/" + appointment.get().getGymTrainingType().getGym().getName(), HttpMethod.GET, request, GymManagerDto.class).getBody();
+        }catch (HttpClientErrorException e) {
+            if (e.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                throw new NotFoundException("NEVALIDAN KORISNIK");
+        }
+
+        //pravim poruku i saljemo menadzeru
         try{
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", authorization);
             //pravimo poruku
-            MessageCreateDto messageCreateDto = new MessageCreateDto();
-            messageCreateDto.setMessageType("CANCELED_APPOINTMENT");
-            messageCreateDto.setUserId(user.getBody().getId());
-            messageCreateDto.setEmail(user.getBody().getEmail());
-            messageCreateDto.setTimeSent(LocalDateTime.now());
-            messageCreateDto.setAppointmentTime(appointment.get().getStart());
-            messageCreateDto.setAppointmentDate(appointment.get().getDate());
-            messageCreateDto.setAppointmentPlace(appointment.get().getGymTrainingType().getGym().getName());
-            messageCreateDto.setFirstName(user.getBody().getFirstName());
-            messageCreateDto.setLink("");
+            MessageCreateDto messageCreateDto = new MessageCreateDto("CANCELED_APPOINTMENT", gymManagerDto.getId(), user.getBody().getFirstName(), appointment.get().getDate(), appointment.get().getStart(), appointment.get().getGymTrainingType().getGym().getName(), gymManagerDto.getEmail(), LocalDateTime.now(), "");
+
+            HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
+            this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);
+        }catch (HttpClientErrorException e) {
+            if (e.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                throw new NotFoundException("NEVALIDAN KORISNIK");
+        }
+
+        //pravimo poruku i saljemo korisniku
+        try{
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", authorization);
+            //pravimo poruku
+            MessageCreateDto messageCreateDto = new MessageCreateDto("CANCELED_APPOINTMENT", user.getBody().getId(), user.getBody().getFirstName(), appointment.get().getDate(), appointment.get().getStart(), appointment.get().getGymTrainingType().getGym().getName(), user.getBody().getEmail(), LocalDateTime.now(), "");
 
             HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
             this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);
@@ -257,19 +294,11 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
             HttpEntity<IdDto> request = new HttpEntity<>(headers);
             ResponseEntity<UserDto> user =  this.userServiceRestTemplate.exchange("/user/client/"+scheduledAppointment.getId().getUserId()+"/cancel-appointment", HttpMethod.POST, request, UserDto.class);
 
-            //pravim poruku i saljemo
+            //pravimo poruku i saljemo
             headers = new HttpHeaders();
             headers.set("Authorization", authorization);
-            MessageCreateDto messageCreateDto = new MessageCreateDto();
-            messageCreateDto.setMessageType("CANCELED_APPOINTMENT");
-            messageCreateDto.setUserId(user.getBody().getId());
-            messageCreateDto.setEmail(user.getBody().getEmail());
-            messageCreateDto.setTimeSent(LocalDateTime.now());
-            messageCreateDto.setAppointmentTime(appointment.getStart());
-            messageCreateDto.setAppointmentDate(appointment.getDate());
-            messageCreateDto.setAppointmentPlace(appointment.getGymTrainingType().getGym().getName());
-            messageCreateDto.setFirstName(user.getBody().getFirstName());
-            messageCreateDto.setLink("");
+
+            MessageCreateDto messageCreateDto = new MessageCreateDto("CANCELED_APPOINTMENT", user.getBody().getId(), user.getBody().getFirstName(), appointment.getDate(), appointment.getStart(), appointment.getGymTrainingType().getGym().getName(), user.getBody().getEmail(), LocalDateTime.now(), "");
 
             HttpEntity<MessageCreateDto> request2 = new HttpEntity<>(messageCreateDto, headers);
             this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request2, MessageCreateDto.class);
@@ -277,6 +306,33 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
             //brisemo zakazan termin izmedju korisnika i appointmenta
             this.scheduledAppointmentRepository.delete(scheduledAppointment);
         });
+
+        //dohvatamo menadzera teretane da bi mu poslali poruku
+        GymManagerDto gymManagerDto = new GymManagerDto();
+        try{
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", authorization);
+
+            HttpEntity<String> request = new HttpEntity<>(headers);
+            gymManagerDto = this.userServiceRestTemplate.exchange("/user/gymmanager/get-by-gym-name/" + appointment.getGymTrainingType().getGym().getName(), HttpMethod.GET, request, GymManagerDto.class).getBody();
+        }catch (HttpClientErrorException e) {
+            if (e.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                throw new NotFoundException("NEVALIDAN KORISNIK");
+        }
+
+        //pravim poruku i saljemo menadzeru
+        try{
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", authorization);
+            //pravimo poruku
+            MessageCreateDto messageCreateDto = new MessageCreateDto("CANCELED_APPOINTMENT", gymManagerDto.getId(), gymManagerDto.getUsername(), appointment.getDate(), appointment.getStart(), appointment.getGymTrainingType().getGym().getName(), gymManagerDto.getEmail(), LocalDateTime.now(), "");
+
+            HttpEntity<MessageCreateDto> request = new HttpEntity<>(messageCreateDto, headers);
+            this.messageServiceRestTemplate.exchange("/message", HttpMethod.POST, request, MessageCreateDto.class);
+        }catch (HttpClientErrorException e) {
+            if (e.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                throw new NotFoundException("NEVALIDAN KORISNIK");
+        }
 
         // Vraćamo odgovor na osnovu uspešno obavljenih akcija
         ScheduledAppointmentDto scheduledAppointmentDto = new ScheduledAppointmentDto();
