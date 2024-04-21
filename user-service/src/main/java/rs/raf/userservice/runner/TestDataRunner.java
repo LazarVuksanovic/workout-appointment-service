@@ -65,9 +65,23 @@ public class TestDataRunner implements CommandLineRunner {
         gymManager.setGymName("Iron Republic");
         gymManager.setEmploymentDate(LocalDate.now());
         gymManager.setVerified(true);
+
+        GymManager gymManager2 = new GymManager();
+        gymManager2.setEmail("lvuksanovic1021rn@raf.rs");
+        gymManager2.setPassword("123");
+        gymManager2.setUsername("manager2");
+        gymManager2.setRole("gymmanager");
+        gymManager2.setFirstName("Milos");
+        gymManager2.setLastName("Nikolic");
+        gymManager2.setDateOfBirth(LocalDate.of(1999, 4, 3));
+        gymManager2.setGymName("Blackworkout");
+        gymManager2.setEmploymentDate(LocalDate.now());
+        gymManager2.setVerified(true);
+
         this.userRepository.save(admin);
         this.userRepository.save(client);
         this.userRepository.save(client2);
         this.userRepository.save(gymManager);
+        this.userRepository.save(gymManager2);
     }
 }
