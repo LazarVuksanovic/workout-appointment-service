@@ -12,6 +12,9 @@ target/
 *.iml
 *.ipr
 
+### Zbog sfre za mail
+.env
+
 ### Eclipse ###
 .apt_generated
 .classpath
