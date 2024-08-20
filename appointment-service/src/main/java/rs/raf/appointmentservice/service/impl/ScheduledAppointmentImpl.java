@@ -1,5 +1,6 @@
 package rs.raf.appointmentservice.service.impl;
 
+import io.jsonwebtoken.Claims;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -27,14 +28,13 @@ import rs.raf.appointmentservice.repository.AppointmentRepository;
 import rs.raf.appointmentservice.repository.GymRepository;
 import rs.raf.appointmentservice.repository.ScheduledAppointmentRepository;
 import rs.raf.appointmentservice.repository.TrainingTypeRepository;
+import rs.raf.appointmentservice.security.TokenService;
 import rs.raf.appointmentservice.service.ScheduledAppointmentService;
 
-import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -48,13 +48,15 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
     private RestTemplate messageServiceRestTemplate;
     private GymRepository gymRepository;
     private TrainingTypeRepository trainingTypeRepository;
+    private TokenService tokenService;
 
     public ScheduledAppointmentImpl(AppointmentRepository appointmentRepository,
                                     AppointmentMapper appointmentMapper,
                                     ScheduledAppointmentRepository scheduledAppointmentRepository,
                                     ScheduledAppointmentMapper scheduledAppointmentMapper,
                                     RestTemplate userServiceRestTemplate, RestTemplate messageServiceRestTemplate,
-                                    GymRepository gymRepository, TrainingTypeRepository trainingTypeRepository){
+                                    GymRepository gymRepository, TrainingTypeRepository trainingTypeRepository,
+                                    TokenService tokenService){
         this.appointmentRepository = appointmentRepository;
         this.appointmentMapper = appointmentMapper;
         this.scheduledAppointmentRepository = scheduledAppointmentRepository;
@@ -63,6 +65,7 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
         this.messageServiceRestTemplate = messageServiceRestTemplate;
         this.gymRepository = gymRepository;
         this.trainingTypeRepository = trainingTypeRepository;
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -273,11 +276,16 @@ public class ScheduledAppointmentImpl implements ScheduledAppointmentService {
         return this.scheduledAppointmentMapper.scheduledAppointmentToScheduledAppointmentDto(scheduledAppointment.get());
     }
 
+    // proba TokenServisa treba poraditi na vracanu greske
     @Override
     public AppointmentDto makeAvailableAgain(String authorization, Long id) {
-        Appointment appointment = this.appointmentRepository.findById(id).get();
-        appointment.setAvailablePlaces(appointment.getMaxPeople());
-        return this.appointmentMapper.appointmentToAppointmentDto(appointment);
+        Claims claims = this.tokenService.parseToken(authorization.substring(authorization.indexOf(" ")));
+        if((claims.get("role", String.class)).equals("gymmanager")){
+            Appointment appointment = this.appointmentRepository.findById(id).get();
+            appointment.setAvailablePlaces(appointment.getMaxPeople());
+            return this.appointmentMapper.appointmentToAppointmentDto(appointment);
+        }
+        return null;
     }
 
     private ScheduledAppointmentDto managerCancelAppointment(String authorization, Appointment appointment, Long managerId){
